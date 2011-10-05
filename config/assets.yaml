@@ -1,0 +1,7 @@
+gzip_assets: off
+compress_assets: off
+
+javascripts:
+  'lib':
+    - lib/build/date_extensions.js
+    - lib/build/localized_string.js

@@ -1,0 +1,12 @@
+{
+  "name"          : "examples-kmalakoff",
+  "description"   : "Working code examples using repositories at https://github.com/kmalakoff",
+  "homepage"      : "https://github.com/kmalakoff/mixin",
+  "keywords"      : ["examples", "kmalakoff", "gist", "javascript", "coffeescript", "backbone", "backbone.js", "backbone-articulation",  "backbone-articulation.js", "background", "background.js", "mixin", "mixin.js", "underscore.js", "underscore", "underscore-awesomer", "underscore-awesomer.js"],
+  "author"        : "Kevin Malakoff <xmann.intl@gmail.com>",
+  "contributors"  : [],
+  "dependencies"  : [],
+  "repository"    : {"type": "git", "url": "git://github.com/kmalakoff/examples-kmalakoff.git"},
+  "main"          : "all_examples.html",
+  "version"       : "0.0.1"
+}
