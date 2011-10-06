@@ -1,7 +1,7 @@
 var root;
 root = this;
 $(document).ready(function() {
-  module("Mixin.AutoMemory");
+  module("Backbone.Articulation.js");
   test("TEST DEPENDENCY MISSING", function() {
     _.VERSION;
     _.AWESOMENESS;
@@ -29,7 +29,7 @@ $(document).ready(function() {
       object: {
         hello: new LocalizedString(1),
         my: new LocalizedString(2),
-        friend: new LocalizedString(3)
+        friends: new LocalizedString(3)
       }
     });
     collection1 = new Backbone.Collection([model1_1, model1_2, model1_3]);
@@ -46,7 +46,7 @@ $(document).ready(function() {
     equal(_.map(model2_2.get('array'), function(loc) {
       return loc.string;
     }).join(' '), 'bonjour mes amis', 'array matched');
-    return equal(_.map(_.remove(_.clone(model2_3.get('object')), ['hello', 'my', 'friend']), function(loc) {
+    return equal(_.map(_.remove(_.clone(model2_3.get('object')), ['hello', 'my', 'friends']), function(loc) {
       return loc.string;
     }).join(' '), 'bonjour mes amis', 'object matched');
   });

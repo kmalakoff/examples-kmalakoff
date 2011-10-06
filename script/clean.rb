@@ -7,8 +7,14 @@ CLEAN_PATTERNS = [
   # Helper Library
   'lib/build/**.js',
 
-  # Backbone-Articulation.js Examples
-  'ex_backbone_articulation_simple/build/**.js'
+  # Examples for individual libraries
+  'ex_backbone_articulation_js/build/**.js',
+  'ex_background_js/build/**.js',
+  'ex_mixin_js/build/**.js',
+  'ex_underscore_awesomer_js/build/**.js',
+
+  # Combined Examples
+  'ex_combined_examples/build/**.js'
 ]
 
 CLEAN_PATTERNS.each do |pattern|

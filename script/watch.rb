@@ -9,8 +9,14 @@ SRC_DIRS = [
   # Helper Library
   'lib/**/*.coffee',
 
-  # Backbone-Articulation.js Examples
-  'ex_backbone_articulation_simple/**/*.coffee'
+  # Examples for individual libraries
+  'ex_backbone_articulation_js/**/*.coffee',
+  'ex_background_js/**/*.coffee',
+  'ex_mixin_js/**/*.coffee',
+  'ex_underscore_awesomer_js/**/*.coffee',
+
+  # Combined Examples
+  'ex_combined_examples/**/*.coffee'
 ]
 
 in_build = false

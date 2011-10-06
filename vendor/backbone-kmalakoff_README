@@ -1,0 +1,5 @@
+This is Backbone.js with a few attribute memory management modifications to allow Backbone-Articulation.js to work.
+
+You can find the latest version at: https://github.com/kmalakoff/backbone
+
+And if they get rolled into the main branch, this will happily go way!
