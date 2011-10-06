@@ -59,8 +59,8 @@ $(document).ready(function() {
       equal($view_failed_loading_el.hasClass('model_loading'), false, 'view_failed_loading element not hasClass model_loading');
       equal($view_failed_loading_el.hasClass('model_loaded'), false, 'view_failed_loading element not hasClass model_loaded');
       equal($view_failed_loading_el.hasClass('model_failed'), true, 'view_failed_loading element not hasClass model_failed');
-      Mixin.out(view_successful_loading);
-      Mixin.out(view_failed_loading);
+      view_successful_loading.release();
+      view_failed_loading.release();
       equal(view_successful_loading.el, null, 'view_successful_loading.el was cleared');
       $view_successful_loading_el = $('body').children("#" + view_successful_loading.id);
       equal($view_successful_loading_el.length, 0, 'view_successful_loading.el was removed');

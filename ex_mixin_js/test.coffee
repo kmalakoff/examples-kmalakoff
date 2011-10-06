@@ -26,9 +26,11 @@ $(document).ready( ->
       callbackModelLoaded: ->
         @killTimeout('Waiting for Model'); @render(true)
 
+    # create a view and send tell is that it's model was loaded
     view_successful_loading = new ViewWithModelLoadingTimeout()
     view_successful_loading.callbackModelLoaded()
 
+    # create a view and let the timer get called triggering it to move into a failed state
     view_failed_loading = new ViewWithModelLoadingTimeout()
 
     #################################
@@ -58,8 +60,8 @@ $(document).ready( ->
       equal($view_failed_loading_el.hasClass('model_failed'), true, 'view_failed_loading element not hasClass model_failed')
 
       # cleanup
-      Mixin.out(view_successful_loading)
-      Mixin.out(view_failed_loading)
+      view_successful_loading.release()
+      view_failed_loading.release()
 
       # all cleaned up
       equal(view_successful_loading.el, null, 'view_successful_loading.el was cleared')
