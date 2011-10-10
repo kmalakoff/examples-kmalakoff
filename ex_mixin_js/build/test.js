@@ -9,7 +9,7 @@ $(document).ready(function() {
     Backbone.VERSION;
     return jQuery._jQuery;
   });
-  return test("Model Loading Message View - Handling Failed Load", function() {
+  test("Model Loading Message View - Handling Failed Load", function() {
     var $view_failed_loading_el, $view_successful_loading_el, ViewWithModelLoadingTimeout, view_failed_loading, view_successful_loading;
     ViewWithModelLoadingTimeout = (function() {
       function ViewWithModelLoadingTimeout() {
@@ -69,5 +69,51 @@ $(document).ready(function() {
       equal($view_failed_loading_el.length, 0, 'view_failed_loading.el was removed');
       return start();
     }), 25);
+  });
+  return test("Dynamic subscriptions", function() {
+    var DynamicBroadcasterListener, dynamic1, dynamic2;
+    DynamicBroadcasterListener = (function() {
+      function DynamicBroadcasterListener() {
+        Mixin["in"](this, [
+          'RefCount', __bind(function() {
+            return Mixin.out(this);
+          }, this)
+        ]);
+        this.sent = [];
+        this.unsent = [];
+        this.received = [];
+      }
+      DynamicBroadcasterListener.prototype.sendUpdate = function() {
+        var args;
+        args = Array.prototype.slice.call(arguments);
+        if (Mixin.hasMixin(this, 'Observable') && this.hasSubscription('update')) {
+          this.notifySubscribers.apply(this, ['update'].concat(args));
+          return this.sent.push(args);
+        } else {
+          return this.unsent.push(args);
+        }
+      };
+      DynamicBroadcasterListener.prototype.receiveUpdate = function() {
+        return this.received.push(Array.prototype.slice.call(arguments));
+      };
+      return DynamicBroadcasterListener;
+    })();
+    dynamic1 = new DynamicBroadcasterListener();
+    Mixin["in"](dynamic1, 'Observable', 'update');
+    dynamic2 = new DynamicBroadcasterListener();
+    Mixin["in"](dynamic2, 'ObservableSubscriber');
+    dynamic1.addSubscriber(dynamic2, 'update', dynamic2.receiveUpdate);
+    dynamic1.sendUpdate('Hello');
+    Mixin.out(dynamic1, 'Observable');
+    dynamic1.sendUpdate('Insane');
+    Mixin["in"](dynamic1, 'Observable', 'update');
+    dynamic1.sendUpdate('Strange and Crazy');
+    dynamic1.addSubscriber(dynamic2, 'update', dynamic2.receiveUpdate);
+    dynamic1.sendUpdate('World!');
+    equal(dynamic1.sent.join(' '), 'Hello Strange and Crazy World!', 'Hello Strange and Crazy World! sent');
+    equal(dynamic1.unsent.join(' '), 'Insane', 'Insane unsent');
+    equal(dynamic2.received.join(' '), 'Hello World!', 'Hello World! received');
+    dynamic1.release();
+    return dynamic2.release();
   });
 });

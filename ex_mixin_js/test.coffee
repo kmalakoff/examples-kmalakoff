@@ -52,6 +52,9 @@ $(document).ready( ->
 
     stop()
     setTimeout((->
+      #################################
+      # Validating the example
+      #################################
       # view is in failed state because the callbackModelLoaded callback was never received
       $view_failed_loading_el = $('body').children("##{view_failed_loading.id}")
       equal($view_failed_loading_el.length, 1, 'view_failed_loading_el element exists')
@@ -63,6 +66,9 @@ $(document).ready( ->
       view_successful_loading.release()
       view_failed_loading.release()
 
+      #################################
+      # Validating the example
+      #################################
       # all cleaned up
       equal(view_successful_loading.el, null, 'view_successful_loading.el was cleared')
       $view_successful_loading_el = $('body').children("##{view_successful_loading.id}")
@@ -73,6 +79,53 @@ $(document).ready( ->
 
       start()
     ), 25)
+  )
 
+  test("Dynamic subscriptions", ->
+
+    class DynamicBroadcasterListener
+      constructor: ->
+        Mixin.in(this, ['RefCount', => Mixin.out(this)])
+        @sent = []; @unsent = []; @received = [];
+
+      sendUpdate: ->
+        args = Array.prototype.slice.call(arguments)
+        if Mixin.hasMixin(this, 'Observable') and @hasSubscription('update')
+          @notifySubscribers.apply(this, ['update'].concat(args))
+          @sent.push(args)
+        else
+          @unsent.push(args)
+
+      receiveUpdate: ->
+        @received.push(Array.prototype.slice.call(arguments))
+
+    # create two dynamic/flexible instances and then make one Observable and the other both
+    dynamic1 = new DynamicBroadcasterListener()
+    Mixin.in(dynamic1, 'Observable', 'update')
+    dynamic2 = new DynamicBroadcasterListener()
+    Mixin.in(dynamic2, 'ObservableSubscriber')
+    dynamic1.addSubscriber(dynamic2, 'update', dynamic2.receiveUpdate)
+
+    # broadcast something and then unmix Observability, send something else (which is unsent)
+    dynamic1.sendUpdate('Hello')
+    Mixin.out(dynamic1, 'Observable') # remove Observable and clear all subscribers
+    dynamic1.sendUpdate('Insane') # not mixed in so will be unsent
+
+    # remix, reconfigure and send something new
+    Mixin.in(dynamic1, 'Observable', 'update')
+    dynamic1.sendUpdate('Strange and Crazy') # no one subscribed but still sent
+    dynamic1.addSubscriber(dynamic2, 'update', dynamic2.receiveUpdate)
+    dynamic1.sendUpdate('World!')
+
+    #################################
+    # Validating the example
+    #################################
+    equal(dynamic1.sent.join(' '), 'Hello Strange and Crazy World!', 'Hello Strange and Crazy World! sent')
+    equal(dynamic1.unsent.join(' '), 'Insane', 'Insane unsent')
+    equal(dynamic2.received.join(' '), 'Hello World!', 'Hello World! received')
+
+    # cleanup
+    dynamic1.release()
+    dynamic2.release()
   )
 )
