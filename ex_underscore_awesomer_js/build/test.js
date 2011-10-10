@@ -1,7 +1,7 @@
 var root;
 root = this;
 $(document).ready(function() {
-  module("Mixin.AutoMemory");
+  module("Underscore.Awesome.js");
   test("TEST DEPENDENCY MISSING", function() {
     _.VERSION;
     return _.AWESOMENESS;
