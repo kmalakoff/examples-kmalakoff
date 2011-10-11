@@ -9,8 +9,8 @@ $(document).ready( ->
     # set up for CouchDB 'type' convention
     _.PARSE_JSON_TYPE_FIELD = 'type'
     # make a Constructors namespace known to Underscore
-    root.Constructors||root.Constructors={};
-    _.PARSE_JSON_CONSTRUCTOR_ROOT = root.Constructors
+    root.Constructors||root.Constructors={}
+    _.PARSE_JSON_CONSTRUCTOR_ROOTS.push(root.Constructors)
 
     class SomeModel
       constructor: (@key, @value) ->

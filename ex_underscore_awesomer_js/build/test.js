@@ -10,7 +10,7 @@ $(document).ready(function() {
     var SomeModel, json, some_model_instance;
     _.PARSE_JSON_TYPE_FIELD = 'type';
     root.Constructors || (root.Constructors = {});
-    _.PARSE_JSON_CONSTRUCTOR_ROOT = root.Constructors;
+    _.PARSE_JSON_CONSTRUCTOR_ROOTS.push(root.Constructors);
     SomeModel = (function() {
       var toJSON;
       function SomeModel(key, value) {
