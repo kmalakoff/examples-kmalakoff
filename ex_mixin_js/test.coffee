@@ -129,7 +129,7 @@ $(document).ready( ->
   )
 
   test("Writing a mixin with instance data", ->
-    # define a new mixin for a rockstar with fans
+    # define a new mixin for a superstar with fans
     Mixin.registerMixin({
       mixin_name: 'Superstar'
 
@@ -147,22 +147,31 @@ $(document).ready( ->
       }
     })
 
+    # make rockstar1 a superstar
     class Rockstar
     rockstar1 = new Rockstar()
     Mixin.in(rockstar1, 'Superstar')
 
+    # create new fans of rockstar1
     class Fan
     fan1 = new Fan(); fan2 = new Fan()
     rockstar1.addFan(fan1).addFan(fan2)
 
+    # fan1 now becomes a superstar and rockstar1 loses his status
+    Mixin.in(fan1, 'Superstar'); Mixin.out(rockstar1, 'Superstar')
+
+    # now everyone becomes a fan of fan1 (even rockstar1!)
+    fan1.addFan(fan2).addFan(rockstar1)
+
     ####################################################
     # Validating the example
     ####################################################
-    fans = rockstar1.getFans()
-    equal(fans[0], fan1, 'fan1 is a fan of rockstar1')
-    equal(fans[1], fan2, 'fan2 is a fan of rockstar1')
+    equal(Mixin.hasMixin(rockstar1, 'Superstar'), false, 'rockstar1 is no longer a superstar, Boo hoo')
+    fans = fan1.getFans()
+    ok(fans[0]==fan2, 'fan2 is a fan of fan1')
+    ok(fans[1]==rockstar1, 'even rockstar1 is a fan of fan1')
 
     # cleanup
-    Mixin.out(rockstar1)
+    Mixin.out(fan1)
   )
 )

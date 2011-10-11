@@ -148,9 +148,13 @@ $(document).ready(function() {
     fan1 = new Fan();
     fan2 = new Fan();
     rockstar1.addFan(fan1).addFan(fan2);
-    fans = rockstar1.getFans();
-    equal(fans[0], fan1, 'fan1 is a fan of rockstar1');
-    equal(fans[1], fan2, 'fan2 is a fan of rockstar1');
-    return Mixin.out(rockstar1);
+    Mixin["in"](fan1, 'Superstar');
+    Mixin.out(rockstar1, 'Superstar');
+    fan1.addFan(fan2).addFan(rockstar1);
+    equal(Mixin.hasMixin(rockstar1, 'Superstar'), false, 'rockstar1 is no longer a superstar, Boo hoo');
+    fans = fan1.getFans();
+    ok(fans[0] === fan2, 'fan2 is a fan of fan1');
+    ok(fans[1] === rockstar1, 'even rockstar1 is a fan of fan1');
+    return Mixin.out(fan1);
   });
 });
