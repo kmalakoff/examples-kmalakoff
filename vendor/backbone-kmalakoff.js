@@ -212,7 +212,7 @@
         // a change in 'id'
         if (previous_id !== new_id) {
           this.id = new_id;
-          if (this.collection) this.collection._updateModelId(this, previous_id); // make sure the collection updates before notification 
+          if (this.collection) this.collection._updateModelId(this, previous_id); // make sure the collection updates before notification
           this.trigger('change:' + this.idAttribute, this, new_id, options); // special case: an id change should not be silent
         }
       }
@@ -224,9 +224,10 @@
       // Update attributes.
       var val, prev;
       for (var attr in attrs) {
+        prev = now[attr];
         val = attrs[attr];
-        if (!_.isEqual(now[attr], val)) {
-          prev = now[attr];
+        // Strict equality check. See: https://github.com/documentcloud/underscore/issues/329
+        if ((Object.getPrototypeOf(Object(prev)) !== Object.getPrototypeOf(Object(val))) || !_.isEqual(prev, val)) {
           now[attr] = val;
           delete escaped[attr];
           this._changed = true;
@@ -283,8 +284,8 @@
 
       if (this._ownAttribute) {
         var model = this;
-        _.each(model.attributes, function(attribute, key) { model._disownAttribute(key, attribute); }); 
-        _.each(model._previousAttributes, function(attribute, key) { model._disownAttribute(key, attribute); }); 
+        _.each(model.attributes, function(attribute, key) { model._disownAttribute(key, attribute); });
+        _.each(model._previousAttributes, function(attribute, key) { model._disownAttribute(key, attribute); });
       }
       this.attributes = {};
       this._previousAttributes = {};
@@ -341,7 +342,7 @@
       options.success = function(resp) {
         model.trigger('destroy', model, model.collection, options);
         if (model._disownAttribute) {
-          _.each(model.attributes, function(attribute, key) { model._disownAttribute(attribute, key); }); 
+          _.each(model.attributes, function(attribute, key) { model._disownAttribute(attribute, key); });
         }
         model.attributes = {};
         if (success) success(model, resp);
@@ -426,7 +427,7 @@
         var model = this, caller_owned_attributes = {};
         _.each(model._previousAttributes, function(attribute, key) { caller_owned_attributes[key] = model._ownAttribute(key, attribute); });
         return caller_owned_attributes;
-      } 
+      }
       else return _.clone(this._previousAttributes);
     },
 
@@ -560,7 +561,7 @@
           // a change in position, save trigger
           if (!options.silent && (previous_index != new_index)) changed_models.push(model);
         }
-        
+
         if (changed_models.length) {
           for (i = 0, l = changed_models.length; i < l; i++) this.trigger('resort', changed_models[i], {});
         }
@@ -648,7 +649,8 @@
     // Reset all internal state. Called when the collection is reset.
     _reset : function(options) {
       this.length = 0;
-      if (this.models && this.models.length) { _.each(this.models, function(model) { model.clear({silent: true}); }); }
+      // don't clear the models because libraries like Backbone.Relational reuse the models
+//      if (this.models && this.models.length) { _.each(this.models, function(model) { model.clear({silent: true}); }); }
       this.models = [];
       this._byId  = {};
       this._byCid = {};
@@ -724,7 +726,7 @@
       }
       this.trigger.apply(this, arguments);
     },
-    
+
     _updateModelId : function(model, previous_id) {
       if (!_.isUndefined(previous_id)) delete this._byId[previous_id];
       if (!_.isUndefined(model.id)) this._byId[model.id] = model;

@@ -70,7 +70,7 @@ $(document).ready(function() {
       return start();
     }), 25);
   });
-  return test("Dynamic subscriptions", function() {
+  test("Dynamic subscriptions", function() {
     var DynamicBroadcasterListener, dynamic1, dynamic2;
     DynamicBroadcasterListener = (function() {
       function DynamicBroadcasterListener() {
@@ -115,5 +115,42 @@ $(document).ready(function() {
     equal(dynamic2.received.join(' '), 'Hello World!', 'Hello World! received');
     dynamic1.release();
     return dynamic2.release();
+  });
+  return test("Writing a mixin with instance data", function() {
+    var Fan, Rockstar, fan1, fan2, fans, rockstar1;
+    Mixin.registerMixin({
+      mixin_name: 'Superstar',
+      initialize: function() {
+        return Mixin.instanceData(this, 'Superstar', {
+          fans: []
+        });
+      },
+      mixin_object: {
+        addFan: function(fan) {
+          Mixin.instanceData(this, 'Superstar').fans.push(fan);
+          return this;
+        },
+        getFans: function() {
+          return Mixin.instanceData(this, 'Superstar').fans;
+        }
+      }
+    });
+    Rockstar = (function() {
+      function Rockstar() {}
+      return Rockstar;
+    })();
+    rockstar1 = new Rockstar();
+    Mixin["in"](rockstar1, 'Superstar');
+    Fan = (function() {
+      function Fan() {}
+      return Fan;
+    })();
+    fan1 = new Fan();
+    fan2 = new Fan();
+    rockstar1.addFan(fan1).addFan(fan2);
+    fans = rockstar1.getFans();
+    equal(fans[0], fan1, 'fan1 is a fan of rockstar1');
+    equal(fans[1], fan2, 'fan2 is a fan of rockstar1');
+    return Mixin.out(rockstar1);
   });
 });

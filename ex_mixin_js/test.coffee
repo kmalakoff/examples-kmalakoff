@@ -82,7 +82,6 @@ $(document).ready( ->
   )
 
   test("Dynamic subscriptions", ->
-
     class DynamicBroadcasterListener
       constructor: ->
         Mixin.in(this, ['RefCount', => Mixin.out(this)])
@@ -127,5 +126,43 @@ $(document).ready( ->
     # cleanup
     dynamic1.release()
     dynamic2.release()
+  )
+
+  test("Writing a mixin with instance data", ->
+    # define a new mixin for a rockstar with fans
+    Mixin.registerMixin({
+      mixin_name: 'Superstar'
+
+      initialize: ->
+        # create instance data with an array of fans
+        Mixin.instanceData(this, 'Superstar', {fans: []})
+
+      mixin_object: {
+        addFan: (fan) ->
+          # get the instance data, and add the fan to the fans array
+          Mixin.instanceData(this, 'Superstar').fans.push(fan)
+          return this # allow chaining
+        getFans: ->
+          return Mixin.instanceData(this, 'Superstar').fans
+      }
+    })
+
+    class Rockstar
+    rockstar1 = new Rockstar()
+    Mixin.in(rockstar1, 'Superstar')
+
+    class Fan
+    fan1 = new Fan(); fan2 = new Fan()
+    rockstar1.addFan(fan1).addFan(fan2)
+
+    ####################################################
+    # Validating the example
+    ####################################################
+    fans = rockstar1.getFans()
+    equal(fans[0], fan1, 'fan1 is a fan of rockstar1')
+    equal(fans[1], fan2, 'fan2 is a fan of rockstar1')
+
+    # cleanup
+    Mixin.out(rockstar1)
   )
 )
