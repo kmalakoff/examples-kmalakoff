@@ -7,7 +7,7 @@ require 'fileutils'
 PROJECT_ROOT = File.expand_path('../..', __FILE__)
 SRC_DIRS = [
   # Helper Library
-  'lib/**/*.coffee',
+  'examples_lib/**/*.coffee',
 
   # Examples for individual libraries
   'ex_backbone_articulation_js/**/*.coffee',

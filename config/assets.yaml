@@ -2,6 +2,6 @@ gzip_assets: off
 compress_assets: off
 
 javascripts:
-  'lib':
-    - lib/build/date_extensions.js
-    - lib/build/localized_string.js
+  'examples_lib':
+    - examples_lib/build/date_extensions.js
+    - examples_lib/build/localized_string.js

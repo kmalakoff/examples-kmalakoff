@@ -5,7 +5,7 @@ require 'fileutils'
 PROJECT_ROOT = File.expand_path('../..', __FILE__)
 CLEAN_PATTERNS = [
   # Helper Library
-  'lib/build/**.js',
+  'examples_lib/build/**.js',
 
   # Examples for individual libraries
   'ex_backbone_articulation_js/build/**.js',

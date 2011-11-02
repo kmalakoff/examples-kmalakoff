@@ -3,8 +3,8 @@ require 'rubygems'
 PROJECT_ROOT = File.expand_path('../..', __FILE__)
 
 # Helper Library
-`cd #{PROJECT_ROOT}; coffee -b -o lib/build -c lib`
-`cd #{PROJECT_ROOT}; jammit -c config/assets.yaml -o lib/build`
+`cd #{PROJECT_ROOT}; coffee -b -o examples_lib/build -c examples_lib`
+`cd #{PROJECT_ROOT}; jammit -c config/assets.yaml -o examples_lib/build`
 
 # Examples for individual libraries
 `cd #{PROJECT_ROOT}; coffee -b -o ex_backbone_articulation_js/build -c ex_backbone_articulation_js`
