@@ -11,7 +11,7 @@ Date::toJSON = ->
     hours:this.getUTCHours(), minutes:this.getUTCMinutes(), seconds:this.getUTCSeconds()
   }
 
-Date.parseJSON = (json) ->
-  throw new Error("Date.parseJSON: unrecognized json") if json._type!='Date'
-  throw new Error("Date.parseJSON: unrecognized json") if json.format!='UTC'
+Date.fromJSON = (json) ->
+  throw new Error("Date.fromJSON: unrecognized json") if json._type!='Date'
+  throw new Error("Date.fromJSON: unrecognized json") if json.format!='UTC'
   return new Date(new Date(Date.UTC(json.year, json.month, json.day, json.hours, json.minutes, json.seconds)))

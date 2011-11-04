@@ -6,6 +6,6 @@ class LocalizedString
 
   toJSON: -> return if (@id!=undefined) then {_type:'LocalizedString', id: @id} else null
 
-  @parseJSON: (json) ->
-    throw new Error("LocalizedString.parseJSON: unrecognized json") if json._type!='LocalizedString'
+  @fromJSON: (json) ->
+    throw new Error("LocalizedString.fromJSON: unrecognized json") if json._type!='LocalizedString'
     return new LocalizedString(json.id)

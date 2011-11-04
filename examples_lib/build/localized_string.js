@@ -16,9 +16,9 @@ LocalizedString = (function() {
       return null;
     }
   };
-  LocalizedString.parseJSON = function(json) {
+  LocalizedString.fromJSON = function(json) {
     if (json._type !== 'LocalizedString') {
-      throw new Error("LocalizedString.parseJSON: unrecognized json");
+      throw new Error("LocalizedString.fromJSON: unrecognized json");
     }
     return new LocalizedString(json.id);
   };

@@ -6,11 +6,11 @@ $(document).ready(function() {
     _.VERSION;
     return _.AWESOMENESS;
   });
-  return test("CouchDB an _.parseJSON", function() {
+  return test("CouchDB an _.fromJSON", function() {
     var SomeModel, json, some_model_instance;
-    _.PARSE_JSON_TYPE_FIELD = 'type';
+    _.FROM_JSON_TYPE_FIELD = 'type';
     root.Constructors || (root.Constructors = {});
-    _.PARSE_JSON_CONSTRUCTOR_ROOTS.push(root.Constructors);
+    _.FROM_JSON_CONSTRUCTOR_ROOTS.push(root.Constructors);
     SomeModel = (function() {
       var toJSON;
       function SomeModel(key, value) {
@@ -24,7 +24,7 @@ $(document).ready(function() {
           value: this.value
         };
       };
-      SomeModel.parseJSON = function(json) {
+      SomeModel.fromJSON = function(json) {
         if (json.type !== 'some_model') {
           throw new Error('unexpected type');
         }
@@ -42,7 +42,7 @@ $(document).ready(function() {
         z: 3
       }
     };
-    some_model_instance = _.parseJSON(json);
+    some_model_instance = _.fromJSON(json);
     ok(some_model_instance instanceof SomeModel, 'some model was deserialized');
     equal(some_model_instance.key, 'abcdef', 'key was deserialized');
     return ok(_.isEqual(some_model_instance.value, {
