@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/kmalakoff/examples-kmalakoff.png)](http://travis-ci.org/kmalakoff/examples-kmalakoff)
+
 This project provided some interesting hopefully sometimes event fun examples of using some of my open source libraries on GitHub!
 
 Current repositories:
@@ -19,3 +21,16 @@ Also, feel free to check out my blog: http://braincode.tumblr.com/
 Enjoy!
 
 Kevin
+
+
+Building, Running and Testing the library
+-----------------------
+
+###Installing:
+
+1. install node.js: http://nodejs.org
+2. install node packages: (sudo) 'npm install'
+
+###Commands:
+
+Look at: https://github.com/kmalakoff/easy-bake

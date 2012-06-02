@@ -1,0 +1,20 @@
+examples_lib:
+  join: examples_lib
+  bare: true
+  output: ./build
+  directories: [examples_lib]
+
+tests:
+  output: ./build
+  directories:
+    - ex_backbone_articulation_js
+    - ex_background_js
+    - ex_combined_examples
+    - ex_mixin_js
+    - ex_underscore_awesomer_js
+  options:
+    test:
+      timeout: 60000
+      runner: phantomjs-qunit-runner.js
+    build:
+      no_files_ok: ['test/packaging']

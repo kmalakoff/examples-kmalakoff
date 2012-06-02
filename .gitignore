@@ -1,18 +1,11 @@
 # osx noise
 .DS_Store
-profile
 
-# xcode noise
-build/*
-*.mode1
-*.mode1v3
-*.mode2v3
-*.perspective
-*.perspectivev3
-*.pbxuser
-*.xcworkspace
-xcuserdata
+node_modules/*
 
-# svn & cvs
-.svn
-CVS
+ex_backbone_articulation_js/build/*
+ex_background_js/build/*
+ex_combined_examples/build/*
+ex_mixin_js/build/*
+ex_underscore_awesomer_js/build/*
+examples_lib/build/*
