@@ -1,4 +1,5 @@
-root = this
+root = @
+
 $(document).ready( ->
   module("Backbone.Articulation.js")
   test("TEST DEPENDENCY MISSING", ->

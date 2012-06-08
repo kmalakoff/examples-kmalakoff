@@ -1,4 +1,5 @@
-root = this
+root = @
+
 $(document).ready( ->
   module("Underscore.Awesome.js")
   test("TEST DEPENDENCY MISSING", ->

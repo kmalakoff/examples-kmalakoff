@@ -1,4 +1,5 @@
-root = this
+root = @
+
 $(document).ready( ->
   module("Background.js")
   test("TEST DEPENDENCY MISSING", ->

@@ -1,4 +1,5 @@
-root = this; root.ENV||root.ENV={}
+root = @; root.ENV||root.ENV={}
+
 class LocalizedString
 
   constructor: (@id) ->

@@ -1,4 +1,5 @@
-root = this
+root = @
+
 $(document).ready( ->
   module("Mixin.js")
   test("TEST DEPENDENCY MISSING", ->

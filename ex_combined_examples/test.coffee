@@ -1,4 +1,5 @@
-root = this
+root = @
+
 $(document).ready( ->
   module("Combined Examples")
   test("TEST DEPENDENCY MISSING", ->
