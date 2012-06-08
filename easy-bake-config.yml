@@ -22,19 +22,19 @@ tests:
 postinstall:
   copy_latest_underscore:
     command: 'cp'
-    args: ['node_modules/underscore/underscore.js', 'vendor/underscore-latest.js']
+    args: ['underscore', 'vendor/underscore-latest.js']
   copy_latest_underscore_awesomer:
     command: 'cp'
-    args: ['node_modules/underscore-awesomer/underscore-awesomer.js', 'vendor/underscore-awesomer-latest.js']
+    args: ['underscore-awesomer', 'vendor/underscore-awesomer-latest.js']
   copy_latest_backbone:
     command: 'cp'
-    args: ['node_modules/backbone/backbone.js', 'vendor/backbone-latest.js']
+    args: ['backbone', 'vendor/backbone-latest.js']
   copy_latest_backbone_articulation:
     command: 'cp'
-    args: ['node_modules/backbone-articulation/backbone-articulation.js', 'vendor/backbone-articulation-latest.js']
+    args: ['backbone-articulation', 'vendor/backbone-articulation-latest.js']
   copy_latest_background:
     command: 'cp'
-    args: ['node_modules/background/background.js', 'vendor/background-latest.js']
+    args: ['background', 'vendor/background-latest.js']
   copy_latest_mixin:
     command: 'cp'
-    args: ['node_modules/mixin-js/mixin-js.js', 'vendor/mixin-js-latest.js']
+    args: ['mixin-js', 'vendor/mixin-js-latest.js']
