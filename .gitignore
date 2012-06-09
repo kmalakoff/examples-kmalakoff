@@ -1,11 +1,3 @@
-# osx noise
 .DS_Store
-
 node_modules/*
-
-ex_backbone_articulation_js/build/*
-ex_background_js/build/*
-ex_combined_examples/build/*
-ex_mixin_js/build/*
-ex_underscore_awesomer_js/build/*
-examples_lib/build/*
+build/
