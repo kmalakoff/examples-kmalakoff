@@ -9,9 +9,8 @@ tests:
   directories:
     - ex_backbone_articulation_js
     - ex_background_js
-    - ex_combined_examples
     - ex_mixin_js
-    - ex_underscore_awesomer_js
+    - ex_json_serialize_js
   options:
     test:
       command: phantomjs
@@ -32,9 +31,15 @@ postinstall:
   copy_latest_backbone_articulation:
     command: 'cp'
     args: ['backbone-articulation', 'vendor/backbone-articulation-latest.js']
+  copy_latest_json_serialize:
+    command: 'cp'
+    args: ['json-serialize', 'vendor/json-serialize-latest.js']
+  copy_latest_lifecycle:
+    command: 'cp'
+    args: ['lifecycle', 'vendor/lifecycle-latest.js']
   copy_latest_backbone_relational:
     command: 'cp'
-    args: ['backbone-articulation/vendor/backbone-relational-latest.js', 'vendor/backbone-articulation-latest.js']
+    args: ['backbone-articulation/vendor/backbone-relational-latest.js', 'vendor/backbone-relational-latest.js']
   copy_latest_background:
     command: 'cp'
     args: ['background', 'vendor/background-latest.js']

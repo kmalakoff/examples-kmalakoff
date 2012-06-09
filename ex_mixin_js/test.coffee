@@ -4,7 +4,6 @@ $(document).ready( ->
   module("Mixin.js")
   test("TEST DEPENDENCY MISSING", ->
     Mixin.VERSION
-    _.VERSION; Backbone.VERSION # for UNMIX_ON_BACKBONE_DESTROY OPTION
     jQuery._jQuery
   )
 

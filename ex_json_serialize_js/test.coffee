@@ -1,17 +1,17 @@
 root = @
 
 $(document).ready( ->
-  module("Underscore.Awesome.js")
+  module("JSON-Serialize.js")
   test("TEST DEPENDENCY MISSING", ->
     _.VERSION; _.AWESOMENESS
   )
 
-  test("CouchDB an _.fromJSON", ->
+  test("CouchDB an JSONS.deserialize", ->
     # set up for CouchDB 'type' convention
-    _.FROM_JSON_TYPE_FIELD = 'type'
+    JSONS.TYPE_FIELD = 'type'
     # make a Constructors namespace known to Underscore
     root.Constructors||root.Constructors={}
-    _.FROM_JSON_CONSTRUCTOR_ROOTS.push(root.Constructors)
+    JSONS.NAMESPACE_ROOTS.push(root.Constructors)
 
     class SomeModel
       constructor: (@key, @value) ->
@@ -24,8 +24,8 @@ $(document).ready( ->
     # assume this comes back from the server
     json = {type:'some_model', key:'abcdef', value: {x:1, y:2, z:3} }
 
-    # deserialize - _.fromJSON finds 'root.Constructors.some_model'
-    some_model_instance = _.fromJSON(json)
+    # deserialize - JSONS.deserialize finds 'root.Constructors.some_model'
+    some_model_instance = JSONS.deserialize(json)
 
     #################################
     # Validating the example

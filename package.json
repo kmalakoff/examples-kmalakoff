@@ -21,6 +21,8 @@
     "underscore-awesomer": "latest",
     "backbone": "latest",
     "backbone-articulation": "latest",
+    "json-serialize": "latest",
+    "lifecycle": "latest",
     "backbone-rel": "latest",
     "background": "latest",
     "mixin-js": "latest"
