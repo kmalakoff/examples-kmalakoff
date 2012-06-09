@@ -32,6 +32,9 @@ postinstall:
   copy_latest_backbone_articulation:
     command: 'cp'
     args: ['backbone-articulation', 'vendor/backbone-articulation-latest.js']
+  copy_latest_backbone_relational:
+    command: 'cp'
+    args: ['backbone-articulation/vendor/backbone-relational-latest.js', 'vendor/backbone-articulation-latest.js']
   copy_latest_background:
     command: 'cp'
     args: ['background', 'vendor/background-latest.js']
