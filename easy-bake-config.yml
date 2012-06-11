@@ -1,11 +1,11 @@
 examples_lib:
+  output: build
   join: examples_lib
   bare: true
-  output: ./build
   directories: [examples_lib]
 
 tests:
-  output: ./build
+  output: build
   directories:
     - ex_backbone_articulation_js
     - ex_background_js
@@ -15,8 +15,10 @@ tests:
     test:
       command: phantomjs
       runner: phantomjs-qunit-runner.js
+      files:
+        - '**/*.html'
     build:
-      no_files_ok: ['test/packaging']
+      no_files_ok: [test/packaging]
 
 postinstall:
   copy_latest_underscore:
