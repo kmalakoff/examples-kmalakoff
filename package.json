@@ -21,11 +21,14 @@
     "underscore-awesomer": "latest",
     "backbone": "latest",
     "backbone-articulation": "latest",
+    "backbone-modelref": "latest",
     "json-serialize": "latest",
     "lifecycle": "latest",
     "backbone-rel": "latest",
     "background": "latest",
-    "mixin-js": "latest"
+    "mixin-js": "latest",
+    "knockback": "latest",
+    "knockback-inspector": "latest"
   },
 
   "version"       : "0.0.1"

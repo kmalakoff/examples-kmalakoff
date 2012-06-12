@@ -1,4 +1,4 @@
-root = @
+root = if typeof(window) == 'undefined' then global else window
 
 $(document).ready( ->
   module("JSON-Serialize.js")

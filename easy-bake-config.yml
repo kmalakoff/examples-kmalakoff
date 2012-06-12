@@ -11,7 +11,7 @@ tests:
     - ex_background_js
     - ex_mixin_js
     - ex_json_serialize_js
-  options:
+  modes:
     test:
       command: phantomjs
       runner: phantomjs-qunit-runner.js
@@ -21,30 +21,16 @@ tests:
       no_files_ok: [test/packaging]
 
 postinstall:
-  copy_latest_underscore:
-    command: 'cp'
-    args: ['underscore', 'vendor/underscore-latest.js']
-  copy_latest_underscore_awesomer:
-    command: 'cp'
-    args: ['underscore-awesomer', 'vendor/underscore-awesomer-latest.js']
-  copy_latest_backbone:
-    command: 'cp'
-    args: ['backbone', 'vendor/backbone-latest.js']
-  copy_latest_backbone_articulation:
-    command: 'cp'
-    args: ['backbone-articulation', 'vendor/backbone-articulation-latest.js']
-  copy_latest_json_serialize:
-    command: 'cp'
-    args: ['json-serialize', 'vendor/json-serialize-latest.js']
-  copy_latest_lifecycle:
-    command: 'cp'
-    args: ['lifecycle', 'vendor/lifecycle-latest.js']
-  copy_latest_backbone_relational:
-    command: 'cp'
-    args: ['backbone-articulation/vendor/backbone-relational-latest.js', 'vendor/backbone-relational-latest.js']
-  copy_latest_background:
-    command: 'cp'
-    args: ['background', 'vendor/background-latest.js']
-  copy_latest_mixin:
-    command: 'cp'
-    args: ['mixin-js', 'vendor/mixin-js-latest.js']
+  commands:
+    - 'cp underscore vendor/underscore-latest.js'
+    - 'cp underscore-awesomer vendor/underscore-awesomer-latest.js'
+    - 'cp backbone vendor/backbone-latest.js'
+    - 'cp backbone-articulation vendor/backbone-articulation-latest.js'
+    - 'cp backbone-articulation/vendor/backbone-relational-latest.js vendor/backbone-relational-latest.js'
+    - 'cp backbone-modelref vendor/backbone-modelref-latest.js'
+    - 'cp json-serialize vendor/json-serialize-latest.js'
+    - 'cp lifecycle vendor/lifecycle-latest.js'
+    - 'cp background vendor/vendor/background-latest.js'
+    - 'cp mixin-js vendor/mixin-js-latest.js'
+    - 'cp knockback vendor/knockback-latest.js'
+    - 'cp knockback-inspector vendor/knockback-inspector-latest.js'
