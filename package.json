@@ -18,17 +18,17 @@
   },
   "optionalDependencies" : {
     "underscore": "latest",
-    "underscore-awesomer": "latest",
     "backbone": "latest",
+
     "backbone-articulation": "latest",
     "backbone-modelref": "latest",
-    "json-serialize": "latest",
-    "lifecycle": "latest",
-    "backbone-rel": "latest",
     "background": "latest",
-    "mixin-js": "latest",
+    "json-serialize": "latest",
     "knockback": "latest",
-    "knockback-inspector": "latest"
+    "knockback-inspector": "latest",
+    "lifecycle": "latest",
+    "mixin-js": "latest",
+    "underscore-awesomer": "latest"
   },
 
   "version"       : "0.0.1"

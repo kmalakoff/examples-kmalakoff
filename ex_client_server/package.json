@@ -1,0 +1,29 @@
+{
+  "author"        : "Kevin Malakoff <https://github.com/kmalakoff>",
+  "name"          : "ex_client_server",
+
+  "url"           : "http://kmalakoff.github.com/examples-kmalakoff/",
+  "homepage"      : "http://kmalakoff.github.com/examples-kmalakoff/",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/kmalakoff/examples-kmalakoff.git"
+  },
+
+  "scripts": {
+    "preinstall": "npm install coffee-script; npm install easy-bake@0.1.2",
+    "postinstall": "cake postinstall"
+  },
+  "optionalDependencies": {
+    "underscore": "latest",
+    "underscore-awesomer": "latest",
+    "backbone": "latest",
+    "backbone-articulation": "latest",
+    "knockout" : "latest",
+    "knockback" : "latest",
+    "knockback-inspector" : "latest",
+    "mixin-js" : "latest",
+    "background" : "latest"
+  },
+
+  "version"       : "0.1.1"
+}
