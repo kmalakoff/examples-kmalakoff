@@ -1,5 +1,5 @@
-application = require 'application'
+window.app = require 'application'
 
 $ ->
-  application.initialize()
+  app.initialize()
   Backbone.history.start()

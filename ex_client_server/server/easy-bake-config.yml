@@ -1,0 +1,3 @@
+app:
+  output: ../app
+  directories: [src]

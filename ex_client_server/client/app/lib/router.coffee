@@ -5,4 +5,4 @@ module.exports = class Router extends Backbone.Router
     '': 'home'
 
   home: ->
-    $('body').html application.homeView.render().el
+    $('body #page').empty().append(application.home_view.render().el)

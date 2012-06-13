@@ -11,11 +11,9 @@ exports.config =
           'vendor/scripts/console-helper.js'
           'vendor/scripts/jquery-1.7.2.js'
 
+          'vendor/scripts/knockout-latest.js'
           'vendor/scripts/kmalakoff-client-bundle.js'
           'vendor/scripts/kmalakoff-shim.js'
-          'vendor/scripts/backbone-relational-latest.js'
-          'vendor/scripts/knockout-latest.js'
-          'vendor/scripts/bootstrap.js'
         ]
 
     stylesheets:
@@ -26,6 +24,7 @@ exports.config =
           'vendor/styles/normalize.css'
           'vendor/styles/bootstrap/bootstrap.css'
           'vendor/styles/bootstrap/bootstrap-responsive.css'
+          'vendor/styles/bootstrap/jquery.ui.all.css'
         ]
         after: ['vendor/styles/helpers.css']
 

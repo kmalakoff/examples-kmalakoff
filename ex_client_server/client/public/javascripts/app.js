@@ -85,10 +85,15 @@
 
   Application = {
     initialize: function() {
-      var HomeView, Router;
+      var HomeView, InspectorDialog, Router;
       HomeView = require('views/home_view');
+      InspectorDialog = require('views/inspector_dialog');
       Router = require('lib/router');
-      this.homeView = new HomeView();
+      ko.setTemplateEngine(new kbi.StringTemplateEngine());
+      $('body').html("<div id='page'>\n</di>");
+      this.inspector = new InspectorDialog();
+      $('body').append(this.inspector.render().el);
+      this.home_view = new HomeView();
       this.router = new Router();
       return typeof Object.freeze === "function" ? Object.freeze(this) : void 0;
     }
@@ -103,12 +108,11 @@
 (this.require.define({
   "initialize": function(exports, require, module) {
     (function() {
-  var application;
 
-  application = require('application');
+  window.app = require('application');
 
   $(function() {
-    application.initialize();
+    app.initialize();
     return Backbone.history.start();
   });
 
@@ -138,22 +142,12 @@
     };
 
     Router.prototype.home = function() {
-      return $('body').html(application.homeView.render().el);
+      return $('body #page').empty().append(application.home_view.render().el);
     };
 
     return Router;
 
   })(Backbone.Router);
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "lib/view_helper": function(exports, require, module) {
-    (function() {
-
-
 
 }).call(this);
 
@@ -208,29 +202,90 @@
 (this.require.define({
   "views/home_view": function(exports, require, module) {
     (function() {
-  var HomeView, View, template,
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  View = require('./view');
+  var HomeView, kb, template;
 
   template = require('./templates/home');
 
-  module.exports = HomeView = (function(_super) {
+  kb = require('knockback');
 
-    __extends(HomeView, _super);
+  module.exports = HomeView = (function() {
 
-    function HomeView() {
-      HomeView.__super__.constructor.apply(this, arguments);
-    }
+    function HomeView() {}
 
-    HomeView.prototype.id = 'home-view';
-
-    HomeView.prototype.template = template;
+    HomeView.prototype.render = function() {
+      this.el = $(template());
+      ko.applyBindings({}, this.el[0]);
+      return this;
+    };
 
     return HomeView;
 
-  })(View);
+  })();
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "views/inspector_dialog": function(exports, require, module) {
+    (function() {
+  var InspectorDialog, InspectorViewModel, error_reporter, kb, template;
+
+  template = require('./templates/inspector');
+
+  kb = require('knockback');
+
+  error_reporter = {
+    error: function() {
+      return alert(JSON.stringify(arguments));
+    }
+  };
+
+  InspectorViewModel = (function() {
+
+    function InspectorViewModel(collection) {
+      var _this = this;
+      this.target = kb.collectionObservable(collection, {
+        view_model: kb.ViewModel
+      });
+      this.is_open = ko.observable(true);
+      this.save = function(vm, event) {
+        var model, _i, _len, _ref, _results;
+        event.target.focus();
+        _ref = _this.target.collection().models;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          model = _ref[_i];
+          _results.push(model.save(null, error_reporter));
+        }
+        return _results;
+      };
+      ko.bindingHandlers['bootstrap'].addVisibilityFns(this, this.is_open);
+    }
+
+    return InspectorViewModel;
+
+  })();
+
+  module.exports = InspectorDialog = (function() {
+
+    function InspectorDialog() {}
+
+    InspectorDialog.prototype.render = function() {
+      var collection;
+      collection = new kbi.FetchedCollection();
+      collection.url = 'http://localhost:3000/models';
+      collection.fetch(error_reporter);
+      this.view_model = new InspectorViewModel(collection);
+      this.el = $(template());
+      ko.applyBindings(this.view_model, this.el[0]);
+      ko.bindingHandlers['bootstrap'].addVisibilityFns(this, this.view_model.is_open);
+      return this;
+    };
+
+    return InspectorDialog;
+
+  })();
 
 }).call(this);
 
@@ -243,45 +298,16 @@
   var foundHelper, self=this;
 
 
-  return "<div id=\"content\">\n  <h1>brunch</h1>\n  <h2>Welcome!</h2>\n  <ul>\n    <li><a href=\"http://brunch.readthedocs.org/\">Documentation</a></li>\n    <li><a href=\"https://github.com/brunch/brunch/issues\">Github Issues</a></li>\n    <li><a href=\"https://github.com/brunch/twitter\">Twitter Example App</a></li>\n    <li><a href=\"https://github.com/brunch/todos\">Todos Example App</a></li>\n  </ul>\n</div>\n";});
+  return "<div class='container'>\n  <div class=\"navbar\">\n    <div class=\"navbar-inner\">\n      <div class=\"container\">\n        <a class=\"brand\" href=\"http://kmalakoff.github.com/\">http://kmalakoff.github.com/</a>\n\n        <ul class=\"nav pull-right\">\n          <li><a data-bind=\"click: app.inspector.open\">Inspector</a></li>\n        </ul>\n      </div>\n    </div>\n  </div>\n</div>\n";});
   }
 }));
 (this.require.define({
-  "views/view": function(exports, require, module) {
-    (function() {
-  var View,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+  "views/templates/inspector": function(exports, require, module) {
+    module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  helpers = helpers || Handlebars.helpers;
+  var foundHelper, self=this;
 
-  require('lib/view_helper');
 
-  module.exports = View = (function(_super) {
-
-    __extends(View, _super);
-
-    function View() {
-      this.render = __bind(this.render, this);
-      View.__super__.constructor.apply(this, arguments);
-    }
-
-    View.prototype.template = function() {};
-
-    View.prototype.getRenderData = function() {};
-
-    View.prototype.render = function() {
-      this.$el.html(this.template(this.getRenderData()));
-      this.afterRender();
-      return this;
-    };
-
-    View.prototype.afterRender = function() {};
-
-    return View;
-
-  })(Backbone.View);
-
-}).call(this);
-
+  return "<div class=\"modal\" data-bind=\"bootstrap: {widget: 'modal', options: {show: is_open()} }, jqueryui: 'draggable'\">\n\n  <div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" data-bind=\"click: toggle\">×</button>\n    <h3>Model and Collection Inspector</h3>\n  </div>\n\n  <div class=\"modal-body\">\n    <ul class='kbi root' data-bind=\"template: {name: 'kbi_collection_node', data: kbi.nvm('root', true, target)}\"></ul>\n  </div>\n\n  <div class=\"modal-footer\">\n    <a href=\"#\" class=\"btn btn-primary\" data-bind=\"click: save\">Save Changes</a>\n  </div>\n</div>";});
   }
 }));

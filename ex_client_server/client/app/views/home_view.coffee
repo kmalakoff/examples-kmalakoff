@@ -1,6 +1,8 @@
-View = require './view'
 template = require './templates/home'
+kb = require('knockback')
 
-module.exports = class HomeView extends View
-  id: 'home-view'
-  template: template
+module.exports = class HomeView
+  render: ->
+    @el = $(template())
+    ko.applyBindings({}, @el[0])
+    @
