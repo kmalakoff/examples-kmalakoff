@@ -1,5 +1,5 @@
 {
-  "author"        : "Kevin Malakoff <https://github.com/kmalakoff>",
+  "author"        : {"name": "Kevin Malakoff", "url": "https://github.com/kmalakoff"},
   "name"          : "ex-server",
   "private"       : true,
 
@@ -23,6 +23,7 @@
     "backbone-articulation": "latest",
     "background" : "latest",
     "json-serialize" : "latest",
+    "knockout" : "latest",
     "knockback" : "latest",
     "knockback-inspector" : "latest",
     "mixin-js" : "latest",

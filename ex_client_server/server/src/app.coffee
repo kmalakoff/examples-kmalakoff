@@ -4,7 +4,6 @@
 ###
 
 express = require 'express'
-express_resource = require 'express-resource'
 _ = require 'underscore'
 
 app = module.exports = express.createServer()

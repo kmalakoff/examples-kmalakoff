@@ -308,6 +308,6 @@
   var foundHelper, self=this;
 
 
-  return "<div class=\"modal\" data-bind=\"bootstrap: {widget: 'modal', options: {show: is_open()} }, jqueryui: 'draggable'\">\n\n  <div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" data-bind=\"click: toggle\">×</button>\n    <h3>Model and Collection Inspector</h3>\n  </div>\n\n  <div class=\"modal-body\">\n    <ul class='kbi root' data-bind=\"template: {name: 'kbi_collection_node', data: kbi.nvm('root', true, target)}\"></ul>\n  </div>\n\n  <div class=\"modal-footer\">\n    <a href=\"#\" class=\"btn btn-primary\" data-bind=\"click: save\">Save Changes</a>\n  </div>\n</div>";});
+  return "<div class=\"modal fade\" data-bind=\"bootstrap: {widget: 'modal', options: {show: is_open()} }\">\n\n  <div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" data-bind=\"click: toggle\">×</button>\n    <h3>Model and Collection Inspector</h3>\n  </div>\n\n  <div class=\"modal-body\">\n    <ul class='kbi root' data-bind=\"template: {name: 'kbi_collection_node', data: kbi.nvm('root', true, target)}\"></ul>\n  </div>\n\n  <div class=\"modal-footer\">\n    <a href=\"#\" class=\"btn btn-primary\" data-bind=\"click: save\">Save Changes</a>\n  </div>\n</div>";});
   }
 }));

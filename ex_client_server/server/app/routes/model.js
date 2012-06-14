@@ -72,11 +72,7 @@
   exports.show = function(req, res) {
     var model;
     model = collection.get(req.body.id);
-    if (model) {
-      return res.json(model.toJSON());
-    } else {
-      return res.json(['FAIL']);
-    }
+    return res.json(model ? model.toJSON() : ['FAIL']);
   };
 
   exports.update = function(req, res) {
@@ -85,23 +81,16 @@
     if (model != null) {
       model.set(model.parse(req.body));
     }
-    if (model) {
-      return res.json(model.toJSON());
-    } else {
-      return res.json(['FAIL']);
-    }
+    return res.json(model ? model.toJSON() : ['FAIL']);
   };
 
   exports.destroy = function(req, res) {
     var model;
-    console.log('destroy: ' + req.body.id);
     model = collection.get(req.body.id);
     if (model) {
       collection.remove(model);
-      return res.json(['OK']);
-    } else {
-      return res.json(['FAIL']);
     }
+    return res.json(model ? ['OK'] : ['FAIL']);
   };
 
 }).call(this);

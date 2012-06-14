@@ -23,14 +23,14 @@ exports.create = (req, res) ->
 
 exports.show = (req, res) ->
   model = collection.get(req.body.id)
-  res.json(if model then model.toJSON(), ['FAIL'])
+  res.json(if model then model.toJSON() else ['FAIL'])
 
 exports.update = (req, res) ->
   model = collection.get(req.body.id)
   model?.set(model.parse(req.body))
-  res.json(if model then model.toJSON(), ['FAIL'])
+  res.json(if model then model.toJSON() else ['FAIL'])
 
 exports.destroy = (req, res) ->
   model = collection.get(req.body.id)
   collection.remove(model) if model
-  res.json(if model then ['OK'], ['FAIL'])
+  res.json(if model then ['OK'] else ['FAIL'])

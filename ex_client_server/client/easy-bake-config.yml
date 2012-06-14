@@ -5,6 +5,7 @@ client_bundle:
         vendor/scripts/kmalakoff-client-bundle.js:
           underscore: underscore
           backbone: backbone
+          knockout: knockout-client/knockout.debug.js
 
           # libraries from https://github.com/kmalakoff
           backbone-articulation: backbone-articulation

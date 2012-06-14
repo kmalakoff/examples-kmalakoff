@@ -1,6 +1,6 @@
 {
-  "author"        : "Kevin Malakoff <https://github.com/kmalakoff>",
-  "name"          : "examples-kmalakoff",
+  "author"        : {"name": "Kevin Malakoff", "url": "https://github.com/kmalakoff"},
+  "name"          : "examples-kmalakoff_dev",
   "description"   : "Working code examples using repositories at https://github.com/kmalakoff",
   "keywords"      : ["examples", "kmalakoff", "javascript", "coffeescript", "knockback", "knockbackjs", "knockback-inspector", "knockbackjs-inspector", "backbone", "backbonejs", "backbone-articulation", "backbone-articulationjs", "background", "backgroundjs", "mixin", "mixinjs", "underscore", "underscore-awesomer", "underscore-awesomerjs"],
 
@@ -22,8 +22,10 @@
 
     "backbone-articulation": "latest",
     "backbone-modelref": "latest",
+    "backbone-relational": "latest",
     "background": "latest",
     "json-serialize": "latest",
+    "knockout-client": "latest",
     "knockback": "latest",
     "knockback-inspector": "latest",
     "lifecycle": "latest",

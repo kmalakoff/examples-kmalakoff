@@ -6,11 +6,9 @@
 
 
 (function() {
-  var app, enableCORSMiddleware, express, express_resource, routes_model, _;
+  var app, enableCORSMiddleware, express, routes_model, _;
 
   express = require('express');
-
-  express_resource = require('express-resource');
 
   _ = require('underscore');
 
