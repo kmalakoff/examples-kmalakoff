@@ -31,7 +31,7 @@ Date.fromJSON = function(json) {
   return new Date(new Date(Date.UTC(json.year, json.month, json.day, json.hours, json.minutes, json.seconds)));
 };
 
-root = typeof window === 'undefined' ? global : window;
+root = this;
 
 root.ENV || (root.ENV = {});
 

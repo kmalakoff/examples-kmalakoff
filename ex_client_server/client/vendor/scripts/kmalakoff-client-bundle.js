@@ -1,22 +1,22 @@
-    (function() {
-      // a require implementation doesn't already exist
-      if (!this.require) {
-        var root = this;
-        var modules = {};
-        this.require = function(module_name) {
-          if (!modules.hasOwnProperty(module_name)) throw "required module missing: " + module_name;
-          if (!modules[module_name].exports) {
-            modules[module_name].exports = {};
-            modules[module_name].loader.call(root, modules[module_name].exports, this.require, modules[module_name]);
-          }
-          return modules[module_name].exports;
-        };
-        this.require.define = function(obj) {
-          for (var module_name in obj) {
-modules[module_name] = {loader: obj[module_name]};
-          };
-        };
+(function() {
+  // a require implementation doesn't already exist
+  if (!this.require) {
+    var root = this;
+    var modules = {};
+    this.require = function(module_name) {
+      if (!modules.hasOwnProperty(module_name)) throw "required module missing: " + module_name;
+      if (!modules[module_name].exports) {
+        modules[module_name].exports = {};
+        modules[module_name].loader.call(root, modules[module_name].exports, this.require, modules[module_name]);
       }
+      return modules[module_name].exports;
+    };
+    this.require.define = function(obj) {
+      for (var module_name in obj) {
+        modules[module_name] = {loader: obj[module_name]};
+      };
+    };
+  }
 this.require.define({
   'underscore': function(exports, require, module) {
 //     Underscore.js 1.3.3
@@ -6576,7 +6576,7 @@ this.require.define({
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  root = typeof window === 'undefined' ? global : window;
+  root = this;
 
   Background = this.Background = typeof exports !== 'undefined' ? exports : {};
 
@@ -7090,7 +7090,7 @@ this.require.define({
 (function() {
   var JSONS, isArray, isEmpty, keyPath, root, stringHasISO8601DateSignature;
 
-  root = typeof window === 'undefined' ? global : window;
+  root = this;
 
   JSONS = this.JSONS = typeof exports !== 'undefined' ? exports : {};
 
@@ -10799,7 +10799,7 @@ this.require.define({
 
   Mixin.AutoMemory || (Mixin.AutoMemory = {});
 
-  Mixin.AutoMemory.root = typeof window === 'undefined' ? global : window;
+  Mixin.AutoMemory.root = this;
 
   Mixin.AutoMemory.WRAPPER = Mixin.AutoMemory.root['$'] ? $ : '$';
 
@@ -11772,7 +11772,7 @@ this.require.define({
 (function() {
   var root, _;
 
-  root = typeof window === 'undefined' ? global : window;
+  root = this;
 
   _ = !this._ && (typeof require !== 'undefined') ? require('underscore')._ : this._;
 
@@ -12357,4 +12357,10 @@ this.require.define({
 
 }
 });
+if (!this['_']) {this['_'] = this.require('underscore');}
+if (!this['Backbone']) {this['Backbone'] = this.require('backbone');}
+if (!this['Backbone.Articulation']) {this['Backbone.Articulation'] = this.require('backbone-articulation');}
+if (!this['ko']) {this['ko'] = this.require('knockout');}
+if (!this['kbi']) {this['kbi'] = this.require('knockback-inspector');}
+this.require('underscore');
 })(this);

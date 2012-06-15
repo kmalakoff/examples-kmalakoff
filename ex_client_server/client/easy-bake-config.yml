@@ -17,3 +17,13 @@ client_bundle:
           lifecycle: lifecycle
           mixin-js: mixin-js
           underscore-awesomer: underscore-awesomer
+
+          # unpack some globals for the application
+          _publish:
+            underscore: _
+            backbone: Backbone
+            backbone-articulation: Backbone.Articulation
+            knockout: ko
+            knockback-inspector: kbi
+          _load:
+            - underscore

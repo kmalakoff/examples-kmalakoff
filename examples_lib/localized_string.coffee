@@ -1,4 +1,4 @@
-root = if typeof(window) == 'undefined' then global else window
+root = @
 root.ENV||root.ENV={}
 
 class LocalizedString
