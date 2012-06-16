@@ -11,6 +11,8 @@ exports.config =
           'vendor/scripts/console-helper.js'
           'vendor/scripts/jquery-1.7.2.js'
           'vendor/scripts/kmalakoff-client-bundle.js'
+          'vendor/scripts/bootstrap.js'
+          'vendor/scripts/knockout-bootstrap.js'
         ]
 
     stylesheets:

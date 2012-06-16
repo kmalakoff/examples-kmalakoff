@@ -248,7 +248,7 @@
       this.target = kb.collectionObservable(collection, {
         view_model: kb.ViewModel
       });
-      this.is_open = ko.observable(true);
+      this.is_open = ko.observable(false);
       this.save = function(vm, event) {
         var model, _i, _len, _ref, _results;
         event.target.focus();
@@ -260,7 +260,15 @@
         }
         return _results;
       };
-      ko.bindingHandlers['bootstrap'].addVisibilityFns(this, this.is_open);
+      this.toggle = function() {
+        return _this.is_open(!_this.is_open());
+      };
+      this.open = function() {
+        return _this.is_open(true);
+      };
+      this.close = function() {
+        return _this.is_open(false);
+      };
     }
 
     return InspectorViewModel;
@@ -279,7 +287,7 @@
       this.view_model = new InspectorViewModel(collection);
       this.el = $(template());
       ko.applyBindings(this.view_model, this.el[0]);
-      ko.bindingHandlers['bootstrap'].addVisibilityFns(this, this.view_model.is_open);
+      _.extend(this, _.pick(this.view_model, 'toggle', 'open', 'close'));
       return this;
     };
 
@@ -308,6 +316,6 @@
   var foundHelper, self=this;
 
 
-  return "<div class=\"modal fade\" data-bind=\"bootstrap: {widget: 'modal', options: {show: is_open()} }\">\n\n  <div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" data-bind=\"click: toggle\">×</button>\n    <h3>Model and Collection Inspector</h3>\n  </div>\n\n  <div class=\"modal-body\">\n    <ul class='kbi root' data-bind=\"template: {name: 'kbi_collection_node', data: kbi.nvm('root', true, target)}\"></ul>\n  </div>\n\n  <div class=\"modal-footer\">\n    <a href=\"#\" class=\"btn btn-primary\" data-bind=\"click: save\">Save Changes</a>\n  </div>\n</div>";});
+  return "<div>\n\n<div class=\"modal fade\" data-bind=\"bootstrapModal: {show: is_open}\">\n\n  <div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" data-bind=\"click: toggle\">×</button>\n    <h3>Model and Collection Inspector</h3>\n  </div>\n\n  <div class=\"modal-body\">\n    <ul class='kbi root' data-bind=\"template: {name: 'kbi_collection_node', data: kbi.nvm('root', true, target)}\"></ul>\n  </div>\n\n  <div class=\"modal-footer\">\n    <a href=\"#\" class=\"btn btn-primary\" data-bind=\"click: save\">Save Changes</a>\n  </div>\n</div>\n\n<ul class=\"nav nav-tabs\" data-bind=\"bootstrapTab: {}\">\n  <li><a href=\"#home\" data-toggle=\"tab\">Home</a></li>\n  <li><a href=\"#profile\" data-toggle=\"tab\">Profile</a></li>\n  <li><a href=\"#messages\" data-toggle=\"tab\">Messages</a></li>\n  <li><a href=\"#settings\" data-toggle=\"tab\">Settings</a></li>\n</ul>\n\n<div class=\"tab-content\">\n  <div class=\"tab-pane active\" id=\"home\">HOME</div>\n  <div class=\"tab-pane\" id=\"profile\">PROFILE</div>\n  <div class=\"tab-pane\" id=\"messages\">MESSAGES</div>\n  <div class=\"tab-pane\" id=\"settings\">SETTINGS</div>\n</div>\n\n\n<h2>Example use of Tooltips</h2>\n<p>Hover over the links below to see tooltips:</p>\n<div class=\"tooltip-demo well\">\n  <p class=\"muted\" style=\"margin-bottom: 0;\">Tight pants next level keffiyeh <a href=\"#\" rel=\"tooltip\" title=\"first tooltip\" data-bind=\"bootstrapToolTip: {}\">you probably</a> haven't heard of them. Photo booth beard raw denim letterpress vegan messenger bag stumptown. Farm-to-table seitan, mcsweeney's fixie sustainable quinoa 8-bit american apparel <a href=\"#\" rel=\"tooltip\" data-bind=\"bootstrapToolTip: {title: 'Another tooltip'}\">have a</a> terry richardson vinyl chambray. Beard stumptown, cardigans banh mi lomo thundercats. Tofu biodiesel williamsburg marfa, four loko mcsweeney's cleanse vegan chambray. A really ironic artisan <a href=\"#\" rel=\"tooltip\" title=\"Another one here too\" data-bind=\"bootstrapToolTip: {}\">whatever keytar</a>, scenester farm-to-table banksy Austin <a href=\"#\" rel=\"tooltip\" title=\"The last tip!\" data-bind=\"bootstrapToolTip: {}\">twitter handle</a> freegan cred raw denim single-origin coffee viral.</p>\n</div>\n\n</div>\n";});
   }
 }));

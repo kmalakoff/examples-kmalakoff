@@ -11,8 +11,11 @@
   },
 
   "scripts": {
-    "preinstall": "npm install coffee-script; npm install easy-bake@0.1.2",
     "postinstall": "cake postinstall"
+  },
+  "devDependencies": {
+    "coffee-script": ">=1.3.3",
+    "easy-bake": "0.1.2"
   },
   "dependencies": {
     "express": "2.5.8"

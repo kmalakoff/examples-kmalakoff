@@ -12359,8 +12359,7 @@ this.require.define({
 });
 if (!this['_']) {this['_'] = this.require('underscore');}
 if (!this['Backbone']) {this['Backbone'] = this.require('backbone');}
-if (!this['Backbone.Articulation']) {this['Backbone.Articulation'] = this.require('backbone-articulation');}
 if (!this['ko']) {this['ko'] = this.require('knockout');}
 if (!this['kbi']) {this['kbi'] = this.require('knockback-inspector');}
-this.require('underscore');
+this.require('backbone-articulation');
 })(this);

@@ -1,100 +1,278 @@
-// knockout-bootstrap.js
-// (c) 2011, 2012 Kevin Malakoff.
-// License: MIT (http://www.opensource.org/licenses/mit-license.php)
-//
-// Note: this was adapted from knockout-jquery-ui-widget.js (https://gist.github.com/889400).
-//
-// Knockout binding for Bootstrap widgets
-//
-// Examples:
-//   <input type="submit" value="OK" data-bind='bootstrap: "button"' />
-//
-//   Attaches a Bootstrap button widget to this button, with default options.
-//
-//   <input id='search'
-//     data-bind='bootstrap: { widget: "model",
-//                            options: { source: open() },
-//                value: searchString' />
-//
-//   Attaches a Bootstrap button widget to this button, with default options.
-
 (function($) {
-    var INVERSES = {
-      'show': 'hide'
-    };
 
-    ko.bindingHandlers['bootstrap'] = {
-        update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
-            var widgetBindings = _getWidgetBindings(element, valueAccessor, allBindingsAccessor, viewModel);
-            var $element = $(element);
+  // KM: plugin-style binding factory
+  ko.pluginbindings = ko.pluginbindings || {};
 
-            // Attach the Bootstrap Widget and/or update its options.
-            // (The syntax is the same for both.)
-            var data = $element.data(widgetBindings.widgetName);
-            if (!data) {
-              $element[widgetBindings.widgetName](widgetBindings.widgetOptions);
-              data = $element.data(widgetBindings.widgetName);
-            }
+  ko.pluginbindings.BindingFactory = function() {
+      var self = this;
 
-            // not all options are handled in the set up so call the specialized functions
-            for (var key in widgetBindings.widgetOptions) {
-              // look for an inverse to the key if the option is false
-              key = widgetBindings.widgetOptions[key] ? key : (INVERSES.hasOwnProperty(key) ? INVERSES[key] : null);
+      this.createBinding = function(widgetConfig) {
+          // KM $.fn[] plugin-style
+          //only support widgets that are available when this script runs
+          if (!$.fn[widgetConfig.parent || widgetConfig.name]) {
+              return;
+          }
 
-              // the data knows how to do this
-              if (key && data.constructor && data.constructor.prototype.hasOwnProperty(key)) data[key]();
+          var binding = {};
+
+          //the binding handler's init function
+          binding.init = function(element, valueAccessor) {
+                //step 1: build appropriate options for the widget from values passed in and global options
+                var options = self.buildOptions(widgetConfig, valueAccessor);
+
+                //apply async, so inner templates can finish content needed during widget initialization
+                if (options.async === true || (widgetConfig.async === true && options.async !== false)) {
+                    setTimeout(function() {
+                        binding.setup(element, options);
+                    }, 0);
+                    return;
+                }
+
+                binding.setup(element, options);
+          };
+
+          //build the core logic for the init function
+          binding.setup = function(element, options) {
+              var widget, $element = $(element);
+
+              //step 2: initialize widget
+              widget = self.getWidget(widgetConfig, options, $element);
+
+              //step 3: add handlers for events that we need to react to for updating the model
+              self.handleEvents(options, widgetConfig, element, widget);
+
+              //step 4: set up computed observables to update the widget when observable model values change
+              self.watchValues(widget, options, widgetConfig, element);
+
+              //step 5: handle disposal, if there is a destroy method on the widget
+              if(widget.destroy) {
+                  ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+                      widget.destroy();
+                  });
+              }
+          };
+
+          binding.options = {}; //global options
+          binding.widgetConfig = widgetConfig; //expose the options to use in generating tests
+
+          ko.bindingHandlers[widgetConfig.bindingName || widgetConfig.name] = binding;
+      };
+
+      //combine options passed in binding with global options
+      this.buildOptions = function(widgetConfig, valueAccessor) {
+          var defaultOption = widgetConfig.defaultOption,
+              options = ko.utils.extend({}, ko.bindingHandlers[widgetConfig.bindingName || widgetConfig.name].options),
+              valueOrOptions = ko.utils.unwrapObservable(valueAccessor());
+
+          if (typeof valueOrOptions !== "object" || (defaultOption && !(defaultOption in valueOrOptions))) {
+              options[defaultOption] = valueAccessor();
+          }  else {
+              ko.utils.extend(options, valueOrOptions);
+          }
+
+          return options;
+      };
+
+      //return the actual widget
+      this.getWidget = function(widgetConfig, options, $element) {
+          var widget;
+          if (widgetConfig.parent) {
+              //locate the actual widget
+              var parent = $element.closest("[data-bind*='" + widgetConfig.parent + ":']");
+              widget = parent.length ? parent.data(widgetConfig.parent) : null;
+          } else {
+              widget = $element[widgetConfig.name](ko.toJS(options)).data(widgetConfig.name);
+          }
+
+          //if the widget option was specified, then fill it with our widget
+          if (ko.isObservable(options.widget)) {
+              options.widget(widget);
+          }
+
+          return widget;
+      };
+
+      //respond to changes in the view model
+      this.watchValues = function(widget, options, widgetConfig, element) {
+          var watchProp, watchValues = widgetConfig.watch;
+          if (watchValues) {
+              for (watchProp in watchValues) {
+                  if (watchValues.hasOwnProperty(watchProp) && ko.isObservable(options[watchProp])) {
+                      self.watchOneValue(watchProp, widget, options, widgetConfig, element);
+                  }
+              }
+          }
+      };
+
+      this.watchOneValue = function(prop, widget, options, widgetConfig, element) {
+          ko.computed({
+              read: function() {
+                  var action = widgetConfig.watch[prop],
+                      value = ko.utils.unwrapObservable(options[prop]),
+                      params = widgetConfig.parent ? [element] : [], //child bindings pass element first to APIs
+                      existing;
+
+                  //support passing multiple events like ["open", "close"]
+                  if ($.isArray(action)) {
+                      action = widget[value ? action[0] : action[1]];
+                  } else if (typeof action === "string") {
+                      action = widget[action];
+                  }
+
+                  if (action) {
+                      existing = action.apply(widget, params);
+                      //try to avoid unnecessary updates when the new value matches the current value
+                      if (existing !== value) {
+                          params.push(value);
+                          action.apply(widget, params);
+                      }
+                  }
+              },
+              disposeWhenNodeIsRemoved: element
+          });
+      };
+
+      //write changes to the widgets back to the model
+      this.handleEvents = function(options, widgetConfig, element, widget) {
+          var prop, event, events = widgetConfig.events;
+
+          if (events) {
+              for (prop in events) {
+                  if (events.hasOwnProperty(prop)) {
+                      event = events[prop];
+                      if (typeof event === "string") {
+                          event = { value: event, writeTo: event };
+                      }
+
+                      if (ko.isObservable(options[event.writeTo])) {
+                          self.handleOneEvent(prop, event, options, element, widget, widgetConfig.childProp);
+                      }
+                  }
+              }
+          }
+      };
+
+      //bind to a single event
+      this.handleOneEvent = function(eventName, eventConfig, options, element, widget, childProp) {
+          // KM: $element
+          widget.$element.bind(eventName, function(e) {
+              var propOrValue, value;
+
+              if (!childProp || !e[childProp] || e[childProp] === element) {
+                  propOrValue = eventConfig.value;
+                  value = (typeof propOrValue === "string" && this[propOrValue]) ? this[propOrValue](childProp && element) : propOrValue;
+                  options[eventConfig.writeTo](value);
+              }
+          });
+      };
+  };
+
+  // KM: bootstrap binding factory
+  ko.bootstrap = ko.bootstrap || {};
+  ko.bootstrap.bindingFactory = new ko.pluginbindings.BindingFactory();
+
+  //utility to set the dataSource will a clean copy of data. Could be overriden at run-time.
+  ko.bootstrap.setDataSource = function(widget, data) {
+      widget.dataSource.data(ko.mapping ? ko.mapping.toJS(data || {}) : ko.toJS(data));
+  };
+
+  //library is in a closure, use this private variable to reduce size of minified file
+  var createBinding = ko.bootstrap.bindingFactory.createBinding.bind(ko.bootstrap.bindingFactory);
+
+  //use constants to ensure consistency and to help reduce minified file size
+  var CLOSE = "close",
+      COLLAPSE = "collapse",
+      CONTENT = "content",
+      DATA = "data",
+      DISABLE = "disable",
+      ENABLE = "enable",
+      EXPAND = "expand",
+      ENABLED = "enabled",
+      EXPANDED = "expanded",
+      ISOPEN = "isOpen",
+      MAX = "max",
+      MIN = "min",
+      OPEN = "open",
+      RESIZE = "resize",
+      SEARCH = "search",
+      SELECT = "select",
+      SELECTED = "selected",
+      SIZE = "size",
+      TITLE = "title",
+      VALUE = "value",
+      VALUES = "values",
+      SHOW = "show",              // KM: hide
+      HIDE = "hide";              // KM: show
+
+    // KM
+    createBinding({
+        bindingName: "bootstrapModal",
+        name: "modal",
+        events: {
+            show: {
+                writeTo: SHOW,
+                value: true
+            },
+            shown: {
+              writeTo: SHOW,
+              value: true
+            },
+            hide: {
+                writeTo: SHOW,
+                value: false
+            },
+            hidden: {
+              writeTo: SHOW,
+              value: false
             }
         },
-
-        addVisibilityFns: function(obj, is_open) {
-          if (obj.toggle)   {throw 'bootstrap: toggle already defined'};
-          if (obj.open)     {throw 'bootstrap: open already defined'};
-          if (obj.close)    {throw 'bootstrap: close already defined'};
-
-          obj.toggle = function()   { is_open(!is_open()); }
-          obj.open = function()     { is_open(false); is_open(true); }  // TODO: figure out how to properly sync the observable state with bootstrap changes
-          obj.close = function()    { is_open(true); is_open(false); }  // TODO: figure out how to properly sync the observable state with bootstrap changes
+        watch: {
+            show: [SHOW, HIDE]
         }
-    };
+    });
 
-    function _getWidgetBindings(element, valueAccessor, allBindingsAccessor, viewModel) {
-        // Extract widgetName and widgetOptions from the data binding,
-        // with some sanity checking and error reporting.
-        // Returns dict: widgetName, widgetOptions.
-
-        var value = valueAccessor(),
-            myBinding = ko.utils.unwrapObservable(value),
-            allBindings = allBindingsAccessor();
-
-        if (typeof(myBinding) === 'string') {
-            // Short-form data-bind='bootstrap: "widget_name"'
-            // with no additional options
-            myBinding = {'widget': myBinding};
+    createBinding({
+        bindingName: "bootstrapTab",
+        name: "tab",
+        events: {
+            show: {
+                writeTo: SHOW,
+                value: true
+            },
+            shown: {
+              writeTo: SHOW,
+              value: true
+            }
+        },
+        watch: {
+            value: [SHOW, HIDE]
         }
+    });
 
-        var widgetName = myBinding.widget,
-            widgetOptions = myBinding.options; // ok if undefined
-
-        // Sanity check: can't directly check that it's truly a _widget_, but
-        // can at least verify that it's a defined function on jQuery:
-        if (typeof $.fn[widgetName] !== 'function')
-        {
-            throw new Error("bootstrap binding doesn't recognize '" + widgetName
-                + "' as Bootstrap widget");
+    createBinding({
+        bindingName: "bootstrapToolTip",
+        name: "tooltip",
+        events: {
+            show: {
+                writeTo: SHOW,
+                value: true
+            },
+            shown: {
+              writeTo: SHOW,
+              value: true
+            },
+            hide: {
+                writeTo: SHOW,
+                value: false
+            },
+            hidden: {
+              writeTo: SHOW,
+              value: false
+            }
+        },
+        watch: {
+            show: [SHOW, HIDE]
         }
-
-        // TODO: support unwrapping of options
-
-        // Sanity check: don't confuse KO's 'options' binding with bootstrap binding's 'options' property
-        if (allBindings.options && !widgetOptions && element.tagName !== 'SELECT') {
-            throw new Error("bootstrap binding options should be specified like this:\n"
-                + "  data-bind='bootstrap: {widget:\"" + widgetName + "\", options:{...} }'");
-        }
-
-        return {
-            widgetName: widgetName,
-            widgetOptions: widgetOptions
-        };
-    }
+    });
 
 })(jQuery);
