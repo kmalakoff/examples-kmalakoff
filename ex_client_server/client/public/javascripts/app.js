@@ -81,18 +81,43 @@
 (this.require.define({
   "application": function(exports, require, module) {
     (function() {
-  var Application;
+  var Application, InspectorDialog,
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  InspectorDialog = require('views/inspector_dialog');
 
   Application = {
-    initialize: function() {
-      var HomeView, InspectorDialog, Router;
-      HomeView = require('views/home_view');
-      InspectorDialog = require('views/inspector_dialog');
-      Router = require('lib/router');
-      ko.setTemplateEngine(new kbi.StringTemplateEngine());
+    configure: function() {
+      var MyModelNodeGenerator, model_node_generator, template_engine;
+      template_engine = new kbi.TemplateEngine();
+      model_node_generator = template_engine.generator('kbi_model_node');
+      MyModelNodeGenerator = (function(_super) {
+
+        __extends(MyModelNodeGenerator, _super);
+
+        function MyModelNodeGenerator() {
+          MyModelNodeGenerator.__super__.constructor.apply(this, arguments);
+        }
+
+        MyModelNodeGenerator.prototype.attributeEditor = function(data) {
+          return "<!-- ko ifnot: (($data == 'id') || ($data == '_type')) -->\n  <fieldset class='kbi'>\n\n    <label data-bind=\"text: $data\"></label>\n\n    <!-- ko switch: $parent.node[$data] -->\n      <!-- ko case: _.isDate($value) -->\n        <input type='date' data-bind=\"jqueryuiDatepicker: {date: $parent.node[$data], onSelect: function() { $parent.node[$data]($(this).datepicker('getDate')); } }\">\n      <!-- /ko -->\n      <!-- ko case: $else -->\n        <input type='text' data-bind=\"value: $parent.node[$data]\">\n      <!-- /ko -->\n    <!-- /ko -->\n\n  </fieldset>\n<!-- /ko -->";
+        };
+
+        return MyModelNodeGenerator;
+
+      })(model_node_generator);
+      template_engine.generator('kbi_model_node', MyModelNodeGenerator);
+      ko.setTemplateEngine(template_engine);
       $('body').html("<div id='page'>\n</di>");
       this.inspector = new InspectorDialog();
-      $('body').append(this.inspector.render().el);
+      return $('body').append(this.inspector.render().el);
+    },
+    initialize: function() {
+      var HomeView, Router;
+      HomeView = require('views/home_view');
+      Router = require('lib/router');
+      Application.configure();
       this.home_view = new HomeView();
       this.router = new Router();
       return typeof Object.freeze === "function" ? Object.freeze(this) : void 0;
@@ -229,7 +254,9 @@
 (this.require.define({
   "views/inspector_dialog": function(exports, require, module) {
     (function() {
-  var InspectorDialog, InspectorViewModel, error_reporter, kb, template;
+  var Backbone, InspectorDialog, InspectorViewModel, MyCollection, MyModel, error_reporter, kb, template,
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
   template = require('./templates/inspector');
 
@@ -240,6 +267,45 @@
       return alert(JSON.stringify(arguments));
     }
   };
+
+  Backbone = require('backbone');
+
+  Backbone.Articulation = require('backbone-articulation');
+
+  MyModel = (function(_super) {
+
+    __extends(MyModel, _super);
+
+    function MyModel() {
+      MyModel.__super__.constructor.apply(this, arguments);
+    }
+
+    MyModel.factory = function(attributes) {
+      if (attributes == null) attributes = {};
+      return new MyModel(_.defaults(attributes, {
+        id: _.uniqueId('id'),
+        name: _.uniqueId('name'),
+        created_at: new Date()
+      }));
+    };
+
+    return MyModel;
+
+  })(Backbone.Articulation.Model);
+
+  MyCollection = (function(_super) {
+
+    __extends(MyCollection, _super);
+
+    function MyCollection() {
+      MyCollection.__super__.constructor.apply(this, arguments);
+    }
+
+    MyCollection.prototype.model = MyModel;
+
+    return MyCollection;
+
+  })(Backbone.Articulation.Collection);
 
   InspectorViewModel = (function() {
 
@@ -281,7 +347,7 @@
 
     InspectorDialog.prototype.render = function() {
       var collection;
-      collection = new kbi.FetchedCollection();
+      collection = new MyCollection();
       collection.url = 'http://localhost:3000/models';
       collection.fetch(error_reporter);
       this.view_model = new InspectorViewModel(collection);
@@ -316,6 +382,6 @@
   var foundHelper, self=this;
 
 
-  return "<div>\n\n<div class=\"modal fade\" data-bind=\"bootstrapModal: {show: is_open}\">\n\n  <div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" data-bind=\"click: toggle\">×</button>\n    <h3>Model and Collection Inspector</h3>\n  </div>\n\n  <div class=\"modal-body\">\n    <ul class='kbi root' data-bind=\"template: {name: 'kbi_collection_node', data: kbi.nvm('root', true, target)}\"></ul>\n  </div>\n\n  <div class=\"modal-footer\">\n    <a href=\"#\" class=\"btn btn-primary\" data-bind=\"click: save\">Save Changes</a>\n  </div>\n</div>\n\n<ul class=\"nav nav-tabs\" data-bind=\"bootstrapTab: {}\">\n  <li><a href=\"#home\" data-toggle=\"tab\">Home</a></li>\n  <li><a href=\"#profile\" data-toggle=\"tab\">Profile</a></li>\n  <li><a href=\"#messages\" data-toggle=\"tab\">Messages</a></li>\n  <li><a href=\"#settings\" data-toggle=\"tab\">Settings</a></li>\n</ul>\n\n<div class=\"tab-content\">\n  <div class=\"tab-pane active\" id=\"home\">HOME</div>\n  <div class=\"tab-pane\" id=\"profile\">PROFILE</div>\n  <div class=\"tab-pane\" id=\"messages\">MESSAGES</div>\n  <div class=\"tab-pane\" id=\"settings\">SETTINGS</div>\n</div>\n\n\n<h2>Example use of Tooltips</h2>\n<p>Hover over the links below to see tooltips:</p>\n<div class=\"tooltip-demo well\">\n  <p class=\"muted\" style=\"margin-bottom: 0;\">Tight pants next level keffiyeh <a href=\"#\" rel=\"tooltip\" title=\"first tooltip\" data-bind=\"bootstrapToolTip: {}\">you probably</a> haven't heard of them. Photo booth beard raw denim letterpress vegan messenger bag stumptown. Farm-to-table seitan, mcsweeney's fixie sustainable quinoa 8-bit american apparel <a href=\"#\" rel=\"tooltip\" data-bind=\"bootstrapToolTip: {title: 'Another tooltip'}\">have a</a> terry richardson vinyl chambray. Beard stumptown, cardigans banh mi lomo thundercats. Tofu biodiesel williamsburg marfa, four loko mcsweeney's cleanse vegan chambray. A really ironic artisan <a href=\"#\" rel=\"tooltip\" title=\"Another one here too\" data-bind=\"bootstrapToolTip: {}\">whatever keytar</a>, scenester farm-to-table banksy Austin <a href=\"#\" rel=\"tooltip\" title=\"The last tip!\" data-bind=\"bootstrapToolTip: {}\">twitter handle</a> freegan cred raw denim single-origin coffee viral.</p>\n</div>\n\n</div>\n";});
+  return "<div>\n\n  <div class=\"modal fade\" data-bind=\"bootstrapModal: {show: is_open}\">\n\n    <div class=\"modal-header\">\n      <button type=\"button\" class=\"close\" data-bind=\"click: toggle\">×</button>\n      <h3>Model and Collection Inspector</h3>\n    </div>\n\n    <div class=\"modal-body\">\n      <ul class='kbi root' data-bind=\"template: {name: 'kbi_collection_node', data: kbi.nvm('root', true, target)}\"></ul>\n    </div>\n\n    <div class=\"modal-footer\">\n      <a href=\"#\" class=\"btn btn-primary\" data-bind=\"click: save\">Save Changes</a>\n    </div>\n\n  </div>\n\n  <ul class=\"nav nav-tabs\" data-bind=\"bootstrapTab: {}\">\n    <li><a href=\"#home\" data-toggle=\"tab\">Home</a></li>\n    <li><a href=\"#profile\" data-toggle=\"tab\">Profile</a></li>\n    <li><a href=\"#messages\" data-toggle=\"tab\">Messages</a></li>\n    <li><a href=\"#settings\" data-toggle=\"tab\">Settings</a></li>\n  </ul>\n\n  <div class=\"tab-content\">\n    <div class=\"tab-pane active\" id=\"home\">HOME</div>\n    <div class=\"tab-pane\" id=\"profile\">PROFILE</div>\n    <div class=\"tab-pane\" id=\"messages\">MESSAGES</div>\n    <div class=\"tab-pane\" id=\"settings\">SETTINGS</div>\n  </div>\n\n\n  <h2>Example use of Tooltips</h2>\n  <p>Hover over the links below to see tooltips:</p>\n  <div class=\"tooltip-demo well\">\n    <p class=\"muted\" style=\"margin-bottom: 0;\">Tight pants next level keffiyeh <a href=\"#\" rel=\"tooltip\" title=\"first tooltip\" data-bind=\"bootstrapToolTip: {}\">you probably</a> haven't heard of them. Photo booth beard raw denim letterpress vegan messenger bag stumptown. Farm-to-table seitan, mcsweeney's fixie sustainable quinoa 8-bit american apparel <a href=\"#\" rel=\"tooltip\" data-bind=\"bootstrapToolTip: {title: 'Another tooltip'}\">have a</a> terry richardson vinyl chambray. Beard stumptown, cardigans banh mi lomo thundercats. Tofu biodiesel williamsburg marfa, four loko mcsweeney's cleanse vegan chambray. A really ironic artisan <a href=\"#\" rel=\"tooltip\" title=\"Another one here too\" data-bind=\"bootstrapToolTip: {}\">whatever keytar</a>, scenester farm-to-table banksy Austin <a href=\"#\" rel=\"tooltip\" title=\"The last tip!\" data-bind=\"bootstrapToolTip: {}\">twitter handle</a> freegan cred raw denim single-origin coffee viral.</p>\n  </div>\n\n</div>";});
   }
 }));

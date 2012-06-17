@@ -1,11 +1,10 @@
 _ = require 'underscore'
-Backbone = require 'backbone'
-Backbone.Articulation = require 'backbone-articulation'
+Articulation = require 'backbone-articulation'
 
-class MyModel extends Backbone.Model
+class MyModel extends Articulation.Model
   @factory: (attributes={}) -> return new MyModel(_.defaults(attributes, {id: _.uniqueId('id'), name: _.uniqueId('name'), created_at: new Date()}))
 
-class MyCollection extends Backbone.Collection
+class MyCollection extends Articulation.Collection
   model: MyModel
 
 collection = new MyCollection()
@@ -14,7 +13,7 @@ collection.add(MyModel.factory())
 collection.add(MyModel.factory())
 
 exports.index = (req, res) ->
-  res.json({results: collection.toJSON()})
+  res.json(collection.toJSON())
 
 exports.create = (req, res) ->
   model = MyModel.factory(); model.set(model.parse(req.body))

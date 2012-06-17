@@ -2,6 +2,15 @@ template = require './templates/inspector'
 kb = require('knockback')
 error_reporter = { error: -> alert(JSON.stringify(arguments)) }
 
+Backbone = require 'backbone'
+Backbone.Articulation = require 'backbone-articulation'
+
+class MyModel extends Backbone.Articulation.Model
+  @factory: (attributes={}) -> return new MyModel(_.defaults(attributes, {id: _.uniqueId('id'), name: _.uniqueId('name'), created_at: new Date()}))
+
+class MyCollection extends Backbone.Articulation.Collection
+  model: MyModel
+
 class InspectorViewModel
   constructor: (collection) ->
     @target = kb.collectionObservable(collection, {view_model: kb.ViewModel})
@@ -17,7 +26,7 @@ class InspectorViewModel
 
 module.exports = class InspectorDialog
   render: ->
-    collection = new kbi.FetchedCollection()
+    collection = new MyCollection()
     collection.url = 'http://localhost:3000/models'
     collection.fetch(error_reporter)
 
