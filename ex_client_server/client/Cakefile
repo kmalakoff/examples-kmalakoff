@@ -1,5 +1,0 @@
-fs = require 'fs'
-mb = require 'module-bundler'
-
-task 'build', 'Build the client bundle', (options) ->
-  mb.writeBundlesSync('bundle-config.coffee', {cwd: fs.realpathSync('.')})
