@@ -1,94 +1,92 @@
 (function(/*! Brunch !*/) {
   'use strict';
 
-  if (!this.require) {
-    var modules = {};
-    var cache = {};
-    var __hasProp = ({}).hasOwnProperty;
+  var globals = typeof window !== 'undefined' ? window : global;
+  if (typeof globals.require === 'function') return;
 
-    var expand = function(root, name) {
-      var results = [], parts, part;
-      if (/^\.\.?(\/|$)/.test(name)) {
-        parts = [root, name].join('/').split('/');
-      } else {
-        parts = name.split('/');
+  var modules = {};
+  var cache = {};
+
+  var has = function(object, name) {
+    return hasOwnProperty.call(object, name);
+  };
+
+  var expand = function(root, name) {
+    var results = [], parts, part;
+    if (/^\.\.?(\/|$)/.test(name)) {
+      parts = [root, name].join('/').split('/');
+    } else {
+      parts = name.split('/');
+    }
+    for (var i = 0, length = parts.length; i < length; i++) {
+      part = parts[i];
+      if (part === '..') {
+        results.pop();
+      } else if (part !== '.' && part !== '') {
+        results.push(part);
       }
-      for (var i = 0, length = parts.length; i < length; i++) {
-        part = parts[i];
-        if (part == '..') {
-          results.pop();
-        } else if (part != '.' && part != '') {
-          results.push(part);
-        }
+    }
+    return results.join('/');
+  };
+
+  var dirname = function(path) {
+    return path.split('/').slice(0, -1).join('/');
+  };
+
+  var localRequire = function(path) {
+    return function(name) {
+      var dir = dirname(path);
+      var absolute = expand(dir, name);
+      return globals.require(absolute);
+    };
+  };
+
+  var initModule = function(name, definition) {
+    var module = {id: name, exports: {}};
+    definition(module.exports, localRequire(name), module);
+    var exports = cache[name] = module.exports;
+    return exports;
+  };
+
+  var require = function(name) {
+    var path = expand(name, '.');
+
+    if (has(cache, path)) return cache[path];
+    if (has(modules, path)) return initModule(path, modules[path]);
+
+    var dirIndex = expand(path, './index');
+    if (has(cache, dirIndex)) return cache[dirIndex];
+    if (has(modules, dirIndex)) return initModule(dirIndex, modules[dirIndex]);
+
+    throw new Error('Cannot find module "' + name + '"');
+  };
+
+  var define = function(bundle) {
+    for (var key in bundle) {
+      if (has(bundle, key)) {
+        modules[key] = bundle[key];
       }
-      return results.join('/');
-    };
-
-    var getFullPath = function(path, fromCache) {
-      var store = fromCache ? cache : modules;
-      var dirIndex;
-      if (__hasProp.call(store, path)) return path;
-      dirIndex = expand(path, './index');
-      if (__hasProp.call(store, dirIndex)) return dirIndex;
-    };
-    
-    var cacheModule = function(name, path, contentFn) {
-      var module = {id: path, exports: {}};
-      try {
-        cache[path] = module.exports;
-        contentFn(module.exports, function(name) {
-          return require(name, dirname(path));
-        }, module);
-        cache[path] = module.exports;
-      } catch (err) {
-        delete cache[path];
-        throw err;
-      }
-      return cache[path];
-    };
-
-    var require = function(name, root) {
-      var path = expand(root, name);
-      var fullPath;
-
-      if (fullPath = getFullPath(path, true)) {
-        return cache[fullPath];
-      } else if (fullPath = getFullPath(path, false)) {
-        return cacheModule(name, fullPath, modules[fullPath]);
-      } else {
-        throw new Error("Cannot find module '" + name + "'");
-      }
-    };
-
-    var dirname = function(path) {
-      return path.split('/').slice(0, -1).join('/');
-    };
-
-    this.require = function(name) {
-      return require(name, '');
-    };
-
-    this.require.brunch = true;
-    this.require.define = function(bundle) {
-      for (var key in bundle) {
-        if (__hasProp.call(bundle, key)) {
-          modules[key] = bundle[key];
-        }
-      }
-    };
+    }
   }
-}).call(this);
+
+  globals.require = require;
+  globals.require.define = define;
+  globals.require.brunch = true;
+})();
+
 // Make it safe to do console.log() always.
 (function (con) {
   var method;
   var dummy = function() {};
   var methods = ('assert,count,debug,dir,dirxml,error,exception,group,' +
-     'groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,' + 
+     'groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,' +
      'time,timeEnd,trace,warn').split(',');
   while (method = methods.pop()) {
     con[method] = con[method] || dummy;
   }
 })(window.console = window.console || {});
+;
+
 /*!
  * jQuery JavaScript Library v1.7.2
  * http://jquery.com/
@@ -3736,7 +3734,7 @@ if ( !jQuery.support.submitBubbles ) {
 			});
 			// return undefined since we don't need an event listener
 		},
-		
+
 		postDispatch: function( event ) {
 			// If form was submitted by the user, bubble the event up the tree
 			if ( event._submit_bubble ) {
@@ -9493,6 +9491,8 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
 
 
 })( window );
+;
+
 /* ===================================================
  * bootstrap-transition.js v2.0.4
  * http://twitter.github.com/bootstrap/javascript.html#transitions
@@ -11317,7 +11317,9 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
     })
   })
 
-}(window.jQuery);/*! jQuery UI - v1.8.21 - 2012-06-05
+}(window.jQuery);;
+
+/*! jQuery UI - v1.8.21 - 2012-06-05
 * https://github.com/jquery/jquery-ui
 * Includes: jquery.ui.core.js, jquery.ui.widget.js, jquery.ui.mouse.js, jquery.ui.draggable.js, jquery.ui.droppable.js, jquery.ui.resizable.js, jquery.ui.selectable.js, jquery.ui.sortable.js, jquery.effects.core.js, jquery.effects.blind.js, jquery.effects.bounce.js, jquery.effects.clip.js, jquery.effects.drop.js, jquery.effects.explode.js, jquery.effects.fade.js, jquery.effects.fold.js, jquery.effects.highlight.js, jquery.effects.pulsate.js, jquery.effects.scale.js, jquery.effects.shake.js, jquery.effects.slide.js, jquery.effects.transfer.js, jquery.ui.accordion.js, jquery.ui.autocomplete.js, jquery.ui.button.js, jquery.ui.datepicker.js, jquery.ui.dialog.js, jquery.ui.position.js, jquery.ui.progressbar.js, jquery.ui.slider.js, jquery.ui.tabs.js
 * Copyright (c) 2012 AUTHORS.txt; Licensed MIT, GPL */
@@ -11580,7 +11582,7 @@ $.extend( $.ui, {
 			if ( !set || !instance.element[ 0 ].parentNode ) {
 				return;
 			}
-	
+
 			for ( var i = 0; i < set.length; i++ ) {
 				if ( instance.options[ set[ i ][ 0 ] ] ) {
 					set[ i ][ 1 ].apply( instance.element, args );
@@ -11588,29 +11590,29 @@ $.extend( $.ui, {
 			}
 		}
 	},
-	
+
 	// will be deprecated when we switch to jQuery 1.4 - use jQuery.contains()
 	contains: function( a, b ) {
 		return document.compareDocumentPosition ?
 			a.compareDocumentPosition( b ) & 16 :
 			a !== b && a.contains( b );
 	},
-	
+
 	// only used by resizable
 	hasScroll: function( el, a ) {
-	
+
 		//If overflow is hidden, the element might have extra content, but the user wants to hide it
 		if ( $( el ).css( "overflow" ) === "hidden") {
 			return false;
 		}
-	
+
 		var scroll = ( a && a === "left" ) ? "scrollLeft" : "scrollTop",
 			has = false;
-	
+
 		if ( el[ scroll ] > 0 ) {
 			return true;
 		}
-	
+
 		// TODO: determine which cases actually cause this to happen
 		// if the element doesn't have the scroll set, see if it's possible to
 		// set the scroll
@@ -11619,7 +11621,7 @@ $.extend( $.ui, {
 		el[ scroll ] = 0;
 		return has;
 	},
-	
+
 	// these are odd functions, fix the API or move into individual plugins
 	isOverAxis: function( x, reference, size ) {
 		//Determines when x coordinate is over "b" element axis
@@ -11987,7 +11989,7 @@ $.widget("ui.mouse", {
 			.bind('mouseup.'+this.widgetName, this._mouseUpDelegate);
 
 		event.preventDefault();
-		
+
 		mouseHandled = true;
 		return true;
 	},
@@ -12118,7 +12120,7 @@ $.widget("ui.draggable", $.ui.mouse, {
 		this.handle = this._getHandle(event);
 		if (!this.handle)
 			return false;
-		
+
 		if ( o.iframeFix ) {
 			$(o.iframeFix === true ? "iframe" : o.iframeFix).each(function() {
 				$('<div class="ui-draggable-iframeFix" style="background: #fff;"></div>')
@@ -12204,12 +12206,12 @@ $.widget("ui.draggable", $.ui.mouse, {
 		if ($.ui.ddmanager && !o.dropBehaviour)
 			$.ui.ddmanager.prepareOffsets(this, event);
 
-		
+
 		this._mouseDrag(event, true); //Execute the drag once - this causes the helper not to be visible before getting its correct position
-		
+
 		//If the ddmanager is used for droppables, inform the manager that dragging has started (see #5003)
 		if ( $.ui.ddmanager ) $.ui.ddmanager.dragStart(this, event);
-		
+
 		return true;
 	},
 
@@ -12248,7 +12250,7 @@ $.widget("ui.draggable", $.ui.mouse, {
 			dropped = this.dropped;
 			this.dropped = false;
 		}
-		
+
 		//if the original element is no longer in the DOM don't bother to continue (see #8269)
 		var element = this.element[0], elementInDom = false;
 		while ( element && (element = element.parentNode) ) {
@@ -12274,30 +12276,30 @@ $.widget("ui.draggable", $.ui.mouse, {
 
 		return false;
 	},
-	
+
 	_mouseUp: function(event) {
 		if (this.options.iframeFix === true) {
-			$("div.ui-draggable-iframeFix").each(function() { 
-				this.parentNode.removeChild(this); 
+			$("div.ui-draggable-iframeFix").each(function() {
+				this.parentNode.removeChild(this);
 			}); //Remove frame helpers
 		}
-		
+
 		//If the ddmanager is used for droppables, inform the manager that dragging has stopped (see #5003)
 		if( $.ui.ddmanager ) $.ui.ddmanager.dragStop(this, event);
-		
+
 		return $.ui.mouse.prototype._mouseUp.call(this, event);
 	},
-	
+
 	cancel: function() {
-		
+
 		if(this.helper.is(".ui-draggable-dragging")) {
 			this._mouseUp({});
 		} else {
 			this._clear();
 		}
-		
+
 		return this;
-		
+
 	},
 
 	_getHandle: function(event) {
@@ -12622,12 +12624,12 @@ $.ui.plugin.add("draggable", "connectToSortable", {
 		};
 
 		$.each(inst.sortables, function(i) {
-			
+
 			//Copy over some variables to allow calling the sortable's native _intersectsWith
 			this.instance.positionAbs = inst.positionAbs;
 			this.instance.helperProportions = inst.helperProportions;
 			this.instance.offset.click = inst.offset.click;
-			
+
 			if(this.instance._intersectsWith(this.instance.containerCache)) {
 
 				//If it intersects, we use a little isOver variable and set it once, so our move-in stuff gets fired only once
@@ -12670,13 +12672,13 @@ $.ui.plugin.add("draggable", "connectToSortable", {
 
 					this.instance.isOver = 0;
 					this.instance.cancelHelperRemoval = true;
-					
+
 					//Prevent reverting on this forced stop
 					this.instance.options.revert = false;
-					
+
 					// The out event needs to be triggered independently
 					this.instance._trigger('out', event, this.instance._uiHash(this.instance));
-					
+
 					this.instance._mouseStop(event, true);
 					this.instance.options.helper = this.instance.options._helper;
 
@@ -12846,7 +12848,7 @@ $.ui.plugin.add("draggable", "stack", {
 			return (parseInt($(a).css("zIndex"),10) || 0) - (parseInt($(b).css("zIndex"),10) || 0);
 		});
 		if (!group.length) { return; }
-		
+
 		var min = parseInt(group[0].style.zIndex) || 0;
 		$(group).each(function(i) {
 			this.style.zIndex = min + i;
@@ -13721,7 +13723,7 @@ $.ui.plugin.add("resizable", "alsoResize", {
 
 		_alsoResize = function (exp, c) {
 			$(exp).each(function() {
-				var el = $(this), start = $(this).data("resizable-alsoresize"), style = {}, 
+				var el = $(this), start = $(this).data("resizable-alsoresize"), style = {},
 					css = c && c.length ? c : el.parents(ui.originalElement[0]).length ? ['width', 'height'] : ['width', 'height', 'top', 'left'];
 
 				$.each(css, function (i, prop) {
@@ -14247,7 +14249,7 @@ $.widget("ui.sortable", $.ui.mouse, {
 
 		//Initialize mouse events for interaction
 		this._mouseInit();
-		
+
 		//We're ready to go
 		this.ready = true
 
@@ -14268,7 +14270,7 @@ $.widget("ui.sortable", $.ui.mouse, {
 	_setOption: function(key, value){
 		if ( key === "disabled" ) {
 			this.options[ key ] = value;
-	
+
 			this.widget()
 				[ value ? "addClass" : "removeClass"]( "ui-sortable-disabled" );
 		} else {
@@ -14357,7 +14359,7 @@ $.widget("ui.sortable", $.ui.mouse, {
 		// TODO: Still need to figure out a way to make relative sorting possible
 		this.helper.css("position", "absolute");
 		this.cssPosition = this.helper.css("position");
-		
+
 		//Generate the original position
 		this.originalPosition = this._generatePosition(event);
 		this.originalPageX = event.pageX;
@@ -14709,7 +14711,7 @@ $.widget("ui.sortable", $.ui.mouse, {
 			? [options.connectWith]
 			: options.connectWith;
 	},
-	
+
 	_getItemsAsjQuery: function(connected) {
 
 		var self = this;
@@ -14882,28 +14884,28 @@ $.widget("ui.sortable", $.ui.mouse, {
 	},
 
 	_contactContainers: function(event) {
-		
-		// get innermost container that intersects with item 
-		var innermostContainer = null, innermostIndex = null;		
-		
-		
+
+		// get innermost container that intersects with item
+		var innermostContainer = null, innermostIndex = null;
+
+
 		for (var i = this.containers.length - 1; i >= 0; i--){
 
-			// never consider a container that's located within the item itself 
+			// never consider a container that's located within the item itself
 			if($.ui.contains(this.currentItem[0], this.containers[i].element[0]))
 				continue;
 
 			if(this._intersectsWith(this.containers[i].containerCache)) {
 
-				// if we've already found a container and it's more "inner" than this, then continue 
+				// if we've already found a container and it's more "inner" than this, then continue
 				if(innermostContainer && $.ui.contains(this.containers[i].element[0], innermostContainer.element[0]))
 					continue;
 
-				innermostContainer = this.containers[i]; 
+				innermostContainer = this.containers[i];
 				innermostIndex = i;
-					
+
 			} else {
-				// container doesn't intersect. trigger "out" event if necessary 
+				// container doesn't intersect. trigger "out" event if necessary
 				if(this.containers[i].containerCache.over) {
 					this.containers[i]._trigger("out", event, this._uiHash(this));
 					this.containers[i].containerCache.over = 0;
@@ -14911,9 +14913,9 @@ $.widget("ui.sortable", $.ui.mouse, {
 			}
 
 		}
-		
-		// if no intersecting containers found, return 
-		if(!innermostContainer) return; 
+
+		// if no intersecting containers found, return
+		if(!innermostContainer) return;
 
 		// move the item into the container if it's not there already
 		if(this.containers.length === 1) {
@@ -14945,9 +14947,9 @@ $.widget("ui.sortable", $.ui.mouse, {
 
 			this.containers[innermostIndex]._trigger("over", event, this._uiHash(this));
 			this.containers[innermostIndex].containerCache.over = 1;
-		} 
-	
-		
+		}
+
+
 	},
 
 	_createHelper: function(event) {
@@ -15447,7 +15449,7 @@ function getElementStyles() {
 			}
 		}
 	}
-	
+
 	return newStyle;
 }
 
@@ -15471,7 +15473,7 @@ function filterStyles(styles) {
 			delete styles[name];
 		}
 	}
-	
+
 	return styles;
 }
 
@@ -15648,7 +15650,7 @@ $.extend($.effects, {
 		if ( element[ 0 ] === active || $.contains( element[ 0 ], active ) ) {
 			$( active ).focus();
 		}
-		
+
 		wrapper = element.parent(); //Hotfix for jQuery 1.4 since some change in wrap() seems to actually loose the reference to the wrapped element
 
 		// transfer positioning properties to the wrapper
@@ -15675,7 +15677,7 @@ $.extend($.effects, {
 	removeWrapper: function(element) {
 		var parent,
 			active = document.activeElement;
-		
+
 		if (element.parent().is('.ui-effects-wrapper')) {
 			parent = element.parent().replaceWith(element);
 			// Fixes #7595 - Elements lose focus when wrapped.
@@ -15684,7 +15686,7 @@ $.extend($.effects, {
 			}
 			return parent;
 		}
-			
+
 		return element;
 	},
 
@@ -15738,12 +15740,12 @@ function standardSpeed( speed ) {
 	if ( !speed || typeof speed === "number" || $.fx.speeds[ speed ] ) {
 		return true;
 	}
-	
+
 	// invalid strings - treat as "normal" speed
 	if ( typeof speed === "string" && !$.effects[ speed ] ) {
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -15758,7 +15760,7 @@ $.fn.extend({
 			},
 			mode = args2.options.mode,
 			effectMethod = $.effects[effect];
-		
+
 		if ( $.fx.off || !effectMethod ) {
 			// delegate to the original method (e.g., .show()) if possible
 			if ( mode ) {
@@ -15771,7 +15773,7 @@ $.fn.extend({
 				});
 			}
 		}
-		
+
 		return effectMethod.call(this, args2);
 	},
 
@@ -16807,7 +16809,7 @@ $.widget( "ui.accordion", {
 
 		self._createIcons();
 		self.resize();
-		
+
 		// ARIA
 		self.element.attr( "role", "tablist" );
 
@@ -16902,7 +16904,7 @@ $.widget( "ui.accordion", {
 
 	_setOption: function( key, value ) {
 		$.Widget.prototype._setOption.apply( this, arguments );
-			
+
 		if ( key == "active" ) {
 			this.activate( value );
 		}
@@ -17641,7 +17643,7 @@ $.widget( "ui.autocomplete", {
 			this._trigger( "close", event );
 		}
 	},
-	
+
 	_change: function( event ) {
 		if ( this.previous !== this.element.val() ) {
 			this._trigger( "change", event, { item: this.selectedItem } );
@@ -17755,7 +17757,7 @@ $.extend( $.ui.autocomplete, {
 
 /*
  * jQuery UI Menu (not officially released)
- * 
+ *
  * This widget isn't yet finished and the API is subject to change. We plan to finish
  * it for the next release. You're welcome to give it a try anyway and give us feedback,
  * as long as you're okay with migrating your code later on. We can help with that, too.
@@ -17791,7 +17793,7 @@ $.widget("ui.menu", {
 			});
 		this.refresh();
 	},
-	
+
 	refresh: function() {
 		var self = this;
 
@@ -17799,7 +17801,7 @@ $.widget("ui.menu", {
 		var items = this.element.children("li:not(.ui-menu-item):has(a)")
 			.addClass("ui-menu-item")
 			.attr("role", "menuitem");
-		
+
 		items.children("a")
 			.addClass("ui-corner-all")
 			.attr("tabindex", -1)
@@ -18250,7 +18252,7 @@ $.widget( "ui.button", {
 				.text(),
 			icons = this.options.icons,
 			multipleIcons = icons.primary && icons.secondary,
-			buttonClasses = [];  
+			buttonClasses = [];
 
 		if ( icons.primary || icons.secondary ) {
 			if ( this.options.text ) {
@@ -18287,7 +18289,7 @@ $.widget( "ui.buttonset", {
 	_create: function() {
 		this.element.addClass( "ui-buttonset" );
 	},
-	
+
 	_init: function() {
 		this.refresh();
 	},
@@ -18299,10 +18301,10 @@ $.widget( "ui.buttonset", {
 
 		$.Widget.prototype._setOption.apply( this, arguments );
 	},
-	
+
 	refresh: function() {
 		var rtl = this.element.css( "direction" ) === "rtl";
-		
+
 		this.buttons = this.element.find( this.options.items )
 			.filter( ":ui-button" )
 				.button( "refresh" )
@@ -18444,7 +18446,7 @@ function Datepicker() {
 $.extend(Datepicker.prototype, {
 	/* Class name added to elements to indicate already configured with a date picker. */
 	markerClassName: 'hasDatepicker',
-	
+
 	//Keep track of the maximum number of rows displayed (see #7043)
 	maxRows: 4,
 
@@ -18453,7 +18455,7 @@ $.extend(Datepicker.prototype, {
 		if (this.debug)
 			console.log.apply('', arguments);
 	},
-	
+
 	// TODO rename to "widget" when switching to widget factory
 	_widgetDatepicker: function() {
 		return this.dpDiv;
@@ -18563,7 +18565,7 @@ $.extend(Datepicker.prototype, {
 				if ($.datepicker._datepickerShowing && $.datepicker._lastInput == input[0])
 					$.datepicker._hideDatepicker();
 				else if ($.datepicker._datepickerShowing && $.datepicker._lastInput != input[0]) {
-					$.datepicker._hideDatepicker(); 
+					$.datepicker._hideDatepicker();
 					$.datepicker._showDatepicker(input[0]);
 				} else
 					$.datepicker._showDatepicker(input[0]);
@@ -18859,7 +18861,7 @@ $.extend(Datepicker.prototype, {
 				case 9: $.datepicker._hideDatepicker();
 						handled = false;
 						break; // hide on tab out
-				case 13: var sel = $('td.' + $.datepicker._dayOverClass + ':not(.' + 
+				case 13: var sel = $('td.' + $.datepicker._dayOverClass + ':not(.' +
 									$.datepicker._currentClass + ')', inst.dpDiv);
 						if (sel[0])
 							$.datepicker._selectDay(event.target, inst.selectedMonth, inst.selectedYear, sel[0]);
@@ -18957,7 +18959,7 @@ $.extend(Datepicker.prototype, {
 	},
 
 	/* Pop-up the date picker for a given input field.
-       If false returned from beforeShow event handler do not show. 
+       If false returned from beforeShow event handler do not show.
 	   @param  input  element - the input field attached to the date picker or
 	                  event - if triggered by focus */
 	_showDatepicker: function(input) {
@@ -19063,7 +19065,7 @@ $.extend(Datepicker.prototype, {
 				// this breaks the change event in IE
 				inst.input.is(':visible') && !inst.input.is(':disabled') && inst.input[0] != document.activeElement)
 			inst.input.focus();
-		// deffered render of the years select (to avoid flashes on Firefox) 
+		// deffered render of the years select (to avoid flashes on Firefox)
 		if( inst.yearshtml ){
 			var origyearshtml = inst.yearshtml;
 			setTimeout(function(){
@@ -19891,7 +19893,7 @@ $.extend(Datepicker.prototype, {
 					drawMonth = 0;
 					drawYear++;
 				}
-				calender += '</tbody></table>' + (isMultiMonth ? '</div>' + 
+				calender += '</tbody></table>' + (isMultiMonth ? '</div>' +
 							((numMonths[0] > 0 && col == numMonths[1]-1) ? '<div class="ui-datepicker-row-break"></div>' : '') : '');
 				group += calender;
 			}
@@ -19959,7 +19961,7 @@ $.extend(Datepicker.prototype, {
 						'>' + year + '</option>';
 				}
 				inst.yearshtml += '</select>';
-				
+
 				html += inst.yearshtml;
 				inst.yearshtml = null;
 			}
@@ -20070,7 +20072,7 @@ $.extend(Datepicker.prototype, {
  * Bind hover events for datepicker elements.
  * Done via delegate so the binding only occurs once in the lifetime of the parent div.
  * Global instActive, set by _updateDatepicker allows the handlers to find their way back to the active picker.
- */ 
+ */
 function bindHover(dpDiv) {
 	var selector = 'button, .ui-datepicker-prev, .ui-datepicker-next, .ui-datepicker-calendar td a';
 	return dpDiv.bind('mouseout', function(event) {
@@ -20113,12 +20115,12 @@ function isArray(a) {
                     Object - settings for attaching new datepicker functionality
    @return  jQuery object */
 $.fn.datepicker = function(options){
-	
+
 	/* Verify an empty collection wasn't passed - Fixes #6976 */
 	if ( !this.length ) {
 		return this;
 	}
-	
+
 	/* Initialise the date picker. */
 	if (!$.datepicker.initialized) {
 		$(document).mousedown($.datepicker._checkExternalClick).
@@ -20248,7 +20250,7 @@ $.widget("ui.dialog", {
 				.attr('tabIndex', -1).css('outline', 0).keydown(function(event) {
 					if (options.closeOnEscape && !event.isDefaultPrevented() && event.keyCode &&
 						event.keyCode === $.ui.keyCode.ESCAPE) {
-						
+
 						self.close(event);
 						event.preventDefault();
 					}
@@ -20350,7 +20352,7 @@ $.widget("ui.dialog", {
 
 	destroy: function() {
 		var self = this;
-		
+
 		if (self.overlay) {
 			self.overlay.destroy();
 		}
@@ -20376,7 +20378,7 @@ $.widget("ui.dialog", {
 	close: function(event) {
 		var self = this,
 			maxZ, thisZ;
-		
+
 		if (false === self._trigger('beforeClose', event)) {
 			return;
 		}
@@ -20669,7 +20671,7 @@ $.widget("ui.dialog", {
 					at: myAt.join(" "),
 					offset: offset.join(" ")
 				};
-			} 
+			}
 
 			position = $.extend({}, $.ui.dialog.prototype.options.position, position);
 		} else {
@@ -20697,7 +20699,7 @@ $.widget("ui.dialog", {
 
 		$.each( options, function( key, value ) {
 			self._setOption( key, value );
-			
+
 			if ( key in sizeRelatedOptions ) {
 				resize = true;
 			}
@@ -20749,7 +20751,7 @@ $.widget("ui.dialog", {
 				if ( isDraggable && !value ) {
 					uiDialog.draggable( "destroy" );
 				}
-				
+
 				if ( !isDraggable && value ) {
 					self._makeDraggable();
 				}
@@ -20811,7 +20813,7 @@ $.widget("ui.dialog", {
 			})
 			.height();
 		minContentHeight = Math.max( 0, options.minHeight - nonContentHeight );
-		
+
 		if ( options.height === "auto" ) {
 			// only needed for IE6 support
 			if ( $.support.minHeight ) {
@@ -20886,7 +20888,7 @@ $.extend($.ui.dialog.overlay, {
 			$(document).bind('keydown.dialog-overlay', function(event) {
 				if (dialog.options.closeOnEscape && !event.isDefaultPrevented() && event.keyCode &&
 					event.keyCode === $.ui.keyCode.ESCAPE) {
-					
+
 					dialog.close(event);
 					event.preventDefault();
 				}
@@ -20922,7 +20924,7 @@ $.extend($.ui.dialog.overlay, {
 		}
 
 		$el.remove();
-		
+
 		// adjust the maxZ to allow other modal dialogs to continue to work (see #4309)
 		var maxZ = 0;
 		$.each(this.instances, function() {
@@ -21061,7 +21063,7 @@ $.fn.position = function( options ) {
 	}
 
 	// force my and at to have valid horizontal and veritcal positions
-	// if a value is missing or invalid, it will be converted to center 
+	// if a value is missing or invalid, it will be converted to center
 	$.each( [ "my", "at" ], function() {
 		var pos = ( options[this] || "" ).split( " " );
 		if ( pos.length === 1) {
@@ -21238,7 +21240,7 @@ if ( !$.offset.setOffset ) {
 				top:  (options.top  - curOffset.top)  + curTop,
 				left: (options.left - curOffset.left) + curLeft
 			};
-		
+
 		if ( 'using' in options ) {
 			options.using.call( elem, props );
 		} else {
@@ -21265,7 +21267,7 @@ if ( !$.offset.setOffset ) {
 
 // fraction support test (older versions of jQuery don't support fractions)
 (function () {
-	var body = document.getElementsByTagName( "body" )[ 0 ], 
+	var body = document.getElementsByTagName( "body" )[ 0 ],
 		div = document.createElement( "div" ),
 		testElement, testElementParent, testElementStyle, offset, offsetTotal;
 
@@ -21467,7 +21469,7 @@ $.widget( "ui.slider", $.ui.mouse, {
 				.addClass( "ui-slider-range" +
 				// note: this isn't the most fittingly semantic framework class for this element,
 				// but worked best visually with a variety of themes
-				" ui-widget-header" + 
+				" ui-widget-header" +
 				( ( o.range === "min" || o.range === "max" ) ? " ui-slider-range-" + o.range : "" ) );
 		}
 
@@ -21513,11 +21515,11 @@ $.widget( "ui.slider", $.ui.mouse, {
 					curVal,
 					newVal,
 					step;
-	
+
 				if ( self.options.disabled ) {
 					return;
 				}
-	
+
 				switch ( event.keyCode ) {
 					case $.ui.keyCode.HOME:
 					case $.ui.keyCode.END:
@@ -21538,14 +21540,14 @@ $.widget( "ui.slider", $.ui.mouse, {
 						}
 						break;
 				}
-	
+
 				step = self.options.step;
 				if ( self.options.values && self.options.values.length ) {
 					curVal = newVal = self.values( index );
 				} else {
 					curVal = newVal = self.value();
 				}
-	
+
 				switch ( event.keyCode ) {
 					case $.ui.keyCode.HOME:
 						newVal = self._valueMin();
@@ -21574,19 +21576,19 @@ $.widget( "ui.slider", $.ui.mouse, {
 						newVal = self._trimAlignValue( curVal - step );
 						break;
 				}
-	
+
 				self._slide( event, index, newVal );
 			})
 			.keyup(function( event ) {
 				var index = $( this ).data( "index.ui-slider-handle" );
-	
+
 				if ( self._keySliding ) {
 					self._keySliding = false;
 					self._stop( event, index );
 					self._change( event, index );
 					$( this ).removeClass( "ui-state-active" );
 				}
-	
+
 			});
 
 		this._refreshValue();
@@ -21668,7 +21670,7 @@ $.widget( "ui.slider", $.ui.mouse, {
 		closestHandle
 			.addClass( "ui-state-active" )
 			.focus();
-		
+
 		offset = closestHandle.offset();
 		mouseOverHandle = !$( event.target ).parents().andSelf().is( ".ui-slider-handle" );
 		this._clickOffset = mouseOverHandle ? { left: 0, top: 0 } : {
@@ -21694,7 +21696,7 @@ $.widget( "ui.slider", $.ui.mouse, {
 	_mouseDrag: function( event ) {
 		var position = { x: event.pageX, y: event.pageY },
 			normValue = this._normValueFromMouse( position );
-		
+
 		this._slide( event, this._handleIndex, normValue );
 
 		return false;
@@ -21713,7 +21715,7 @@ $.widget( "ui.slider", $.ui.mouse, {
 
 		return false;
 	},
-	
+
 	_detectOrientation: function() {
 		this.orientation = ( this.options.orientation === "vertical" ) ? "vertical" : "horizontal";
 	},
@@ -21770,7 +21772,7 @@ $.widget( "ui.slider", $.ui.mouse, {
 		if ( this.options.values && this.options.values.length ) {
 			otherVal = this.values( index ? 0 : 1 );
 
-			if ( ( this.options.values.length === 2 && this.options.range === true ) && 
+			if ( ( this.options.values.length === 2 && this.options.range === true ) &&
 					( ( index === 0 && newVal > otherVal) || ( index === 1 && newVal < otherVal ) )
 				) {
 				newVal = otherVal;
@@ -21955,7 +21957,7 @@ $.widget( "ui.slider", $.ui.mouse, {
 			return vals;
 		}
 	},
-	
+
 	// returns the step-aligned value that val is closest to, between (inclusive) min and max
 	_trimAlignValue: function( val ) {
 		if ( val <= this._valueMin() ) {
@@ -21984,7 +21986,7 @@ $.widget( "ui.slider", $.ui.mouse, {
 	_valueMax: function() {
 		return this.options.max;
 	},
-	
+
 	_refreshValue: function() {
 		var oRange = this.options.range,
 			o = this.options,
@@ -22763,7 +22765,7 @@ $.extend( $.ui.tabs.prototype, {
 				var t = o.selected;
 				self.select( ++t < self.anchors.length ? t : 0 );
 			}, ms );
-			
+
 			if ( e ) {
 				e.stopPropagation();
 			}
@@ -22798,27 +22800,61 @@ $.extend( $.ui.tabs.prototype, {
 });
 
 })( jQuery );
+;
+
 (function() {
-  // a require implementation doesn't already exist
-  if (!this.require) {
-    var root = this;
-    var modules = {};
-    this.require = function(module_name) {
-      if (!modules.hasOwnProperty(module_name)) throw "required module missing: " + module_name;
-      if (!modules[module_name].exports) {
-        modules[module_name].exports = {};
-        modules[module_name].loader.call(root, modules[module_name].exports, this.require, modules[module_name]);
-      }
-      return modules[module_name].exports;
-    };
-    this.require.define = function(obj) {
-      for (var module_name in obj) {
-        modules[module_name] = {loader: obj[module_name]};
-      };
-    };
+var root = this;
+var root_require = root.require;
+var root_require_define = root_require ? root.require.define : null;
+var root_require_resolve = root_require ? root.require.resolve : null;
+
+/*
+Define module-bundler require functions
+*/
+var mb = (typeof(exports) !== 'undefined') ? exports : {};
+mb.modules = {};
+mb.require = function(module_name) {
+  if (!mb.modules.hasOwnProperty(module_name)) {
+    if (root_require) {
+      return root_require.apply(this, arguments);
+    }
+    throw "Cannot find module '" + module_name + "'";
   }
-this.require.define({
-  'underscore': function(exports, require, module) {
+  if (!mb.modules[module_name].exports) {
+    mb.modules[module_name].exports = {};
+    mb.modules[module_name].loader.call(root, mb.modules[module_name].exports, mb.require, mb.modules[module_name]);
+  }
+  return mb.modules[module_name].exports;
+};
+mb.require_define = function(obj) {
+  for (var module_name in obj) {
+    mb.modules[module_name] = {loader: obj[module_name]};
+  }
+};
+mb.require_alias = function(alias_name, module_name) {
+  mb.modules[alias_name] = {exports: root.require(module_name)};
+};
+mb.require_resolve = function(module_name) {
+  if (!mb.modules[module_name]) {
+    if (root_require_resolve) {
+      return root_require_resolve.apply(this, arguments);
+    }
+    throw "Cannot find module '" + module_name + "'"
+  }
+  return module_name;
+};
+
+// overwrite the root implementation
+root.require = mb.require;
+if (root_require) {
+  // copy all additional properties
+  for (var key in root_require)
+    root.require[key] = root_require[key];
+}
+root.require.resolve = mb.require_resolve;
+
+mb.require_define({'underscore': function(exports, require, module) {
+
 //     Underscore.js 1.3.3
 //     (c) 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.
 //     Underscore is freely distributable under the MIT license.
@@ -23879,10 +23915,10 @@ this.require.define({
 
 }).call(this);
 
-}
-});
-this.require.define({
-  'backbone': function(exports, require, module) {
+}});
+
+mb.require_define({'backbone': function(exports, require, module) {
+
 //     Backbone.js 0.9.2
 
 //     (c) 2010-2012 Jeremy Ashkenas, DocumentCloud Inc.
@@ -25315,10 +25351,10 @@ this.require.define({
 
 }).call(this);
 
-}
-});
-this.require.define({
-  'knockout': function(exports, require, module) {
+}});
+
+mb.require_define({'knockout': function(exports, require, module) {
+
 // Knockout JavaScript library v2.1.0
 // (c) Steven Sanderson - http://knockoutjs.com/
 // License: MIT (http://www.opensource.org/licenses/mit-license.php)
@@ -28763,14 +28799,14 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
 });
 })(window,document,navigator);
 
-}
-});
-this.require.define({
-  'backbone-articulation': function(exports, require, module) {
+}});
+
+mb.require_define({'backbone-articulation': function(exports, require, module) {
+
 // Generated by CoffeeScript 1.3.3
 
 /*
-  backbone-articulation.js 0.3.2
+  backbone-articulation.js 0.3.3
   (c) 2011, 2012 Kevin Malakoff.
   Backbone-Articulation may be freely distributed under the MIT license.
   https://github.com/kmalakoff/backbone-articulation
@@ -28782,9 +28818,17 @@ this.require.define({
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  _ = typeof require !== 'undefined' ? require('underscore') : this._;
+  if (typeof require !== 'undefined') {
+    try {
+      _ = require('lodash');
+    } catch (e) {
+      _ = require('underscore');
+    }
+  } else {
+    _ = this._;
+  }
 
-  if (_ && !_.VERSION) {
+  if (_ && (_.hasOwnProperty('_'))) {
     _ = _._;
   }
 
@@ -28796,7 +28840,7 @@ this.require.define({
 
   Backbone.Articulation = Articulation = typeof exports !== 'undefined' ? exports : {};
 
-  Articulation.VERSION = '0.3.2';
+  Articulation.VERSION = '0.3.3';
 
   Articulation.TYPE_UNDERSCORE_SINGULARIZE = false;
 
@@ -29038,14 +29082,14 @@ this.require.define({
 
 }).call(this);
 
-}
-});
-this.require.define({
-  'backbone-modelref': function(exports, require, module) {
+}});
+
+mb.require_define({'backbone-modelref': function(exports, require, module) {
+
 // Generated by CoffeeScript 1.3.3
 
 /*
-  backbone-modelref.js 0.1.2
+  backbone-modelref.js 0.1.3
   (c) 2011, 2012 Kevin Malakoff.
   Backbone-ModelRef.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -29059,9 +29103,17 @@ this.require.define({
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  _ = !this._ && (typeof require !== 'undefined') ? require('underscore') : this._;
+  if (typeof require !== 'undefined') {
+    try {
+      _ = require('lodash');
+    } catch (e) {
+      _ = require('underscore');
+    }
+  } else {
+    _ = this._;
+  }
 
-  if (_ && !_.VERSION) {
+  if (_ && (_.hasOwnProperty('_'))) {
     _ = _._;
   }
 
@@ -29203,7 +29255,7 @@ this.require.define({
 
   __extends(Backbone.ModelRef.prototype, Backbone.Events);
 
-  Backbone.ModelRef.VERSION = '0.1.2';
+  Backbone.ModelRef.VERSION = '0.1.3';
 
   Backbone.ModelRef.MODEL_EVENTS_WHEN_LOADED = ['reset', 'remove'];
 
@@ -29343,18 +29395,18 @@ this.require.define({
     this.Backbone.ModelRef = Backbone.ModelRef;
   }
 
-  Backbone.ModelRef.VERSION = '0.1.2';
+  Backbone.ModelRef.VERSION = '0.1.3';
 
 }).call(this);
 
-}
-});
-this.require.define({
-  'background': function(exports, require, module) {
+}});
+
+mb.require_define({'background': function(exports, require, module) {
+
 // Generated by CoffeeScript 1.3.3
 
 /*
-  background.js 0.2.2
+  background.js 0.3.0
   (c) 2011, 2012 Kevin Malakoff.
   Mixin is freely distributable under the MIT license.
   See the following for full license details:
@@ -29364,7 +29416,7 @@ this.require.define({
 
 
 (function() {
-  var Background, root,
+  var Background, legacyToLatestTask, root,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -29372,7 +29424,22 @@ this.require.define({
 
   Background = this.Background = typeof exports !== 'undefined' ? exports : {};
 
-  Background.VERSION = '0.2.2';
+  Background.VERSION = '0.3.0';
+
+  legacyToLatestTask = function() {
+    var functions;
+    functions = {};
+    if (arguments.length > 0) {
+      functions.start = arguments[0];
+    }
+    if (arguments.length > 1) {
+      functions.tick = arguments[1];
+    }
+    if (arguments.length > 2) {
+      functions.finish = arguments[2];
+    }
+    return functions;
+  };
 
   Background._JobContainer = (function() {
 
@@ -29380,15 +29447,15 @@ this.require.define({
       this.frequency = frequency;
       this.jobs = [];
       this.timeout = 0;
-      this.being_destroyed = false;
+      this.in_destroy = false;
     }
 
     _JobContainer.prototype.destroy = function() {
-      return this.being_destroyed = true;
+      return this.in_destroy = true;
     };
 
     _JobContainer.prototype.isDestroyed = function() {
-      return this.being_destroyed || this.destroyed;
+      return this.in_destroy || this.destroyed;
     };
 
     _JobContainer.prototype.isEmpty = function() {
@@ -29396,12 +29463,12 @@ this.require.define({
     };
 
     _JobContainer.prototype.tick = function() {
-      if (this.being_destroyed) {
+      if (this.in_destroy) {
         this._doDestroy();
         return;
       }
       this._doTick();
-      if (this.being_destroyed) {
+      if (this.in_destroy) {
         this._doDestroy();
       }
     };
@@ -29417,16 +29484,19 @@ this.require.define({
       }
     };
 
-    _JobContainer.prototype._appendJob = function(init_fn_or_job, run_fn, destroy_fn) {
+    _JobContainer.prototype._appendJob = function(functions) {
       var job,
         _this = this;
-      if (this.isDestroyed()) {
-        throw new Error("Background._JobContainer._appendJob: trying to append a job to a destroyed container");
+      if (arguments.length > 1) {
+        functions = legacyToLatestTask.apply(null, arguments);
       }
-      if (Background.Job.isAJob(init_fn_or_job)) {
-        job = init_fn_or_job;
+      if (this.isDestroyed()) {
+        throw "Trying to append a job to a destroyed container";
+      }
+      if (functions instanceof Background.Job) {
+        job = functions;
       } else {
-        job = new Background.Job(init_fn_or_job, run_fn, destroy_fn);
+        job = new Background.Job(functions);
       }
       this.jobs.push(job);
       if (!this.timeout) {
@@ -29444,8 +29514,8 @@ this.require.define({
     };
 
     _JobContainer.prototype._doDestroy = function() {
-      if (!this.being_destroyed || this.is_destroyed) {
-        throw new Error("Background._JobContainer.destroy: destroy state is corrupted");
+      if (!this.in_destroy || this.is_destroyed) {
+        throw "Destroy state is corrupted";
       }
       this.is_destroyed = true;
       return this.clear();
@@ -29462,7 +29532,7 @@ this.require.define({
       this.total_count = total_count;
       this.current_range = current_range;
       if (!this.batch_length || (this.total_count === void 0) || !this.current_range) {
-        throw new Error("Background._ArrayIterator: parameters invalid");
+        throw "Iterator parameters invalid";
       }
       this.reset();
     }
@@ -29508,29 +29578,33 @@ this.require.define({
 
   Background.Job = (function() {
 
-    function Job(init_fn, run_fn, destroy_fn) {
-      this.init_fn = init_fn;
-      this.run_fn = run_fn;
-      this.destroy_fn = destroy_fn;
-      if (!this.run_fn) {
-        throw new Error('run_fn is mandatory');
+    function Job(functions) {
+      this.functions = functions;
+      if (arguments.length > 1) {
+        this.functions = legacyToLatestTask.apply(null, arguments);
+      }
+      if (!functions) {
+        throw "Missing task functions";
+      }
+      if (typeof this.functions === 'function') {
+        this.functions = {
+          tick: this.functions
+        };
       }
       this.was_completed = false;
     }
 
     Job.prototype.destroy = function() {
       this._cleanup();
-      this.run_fn = null;
-      this.init_fn = null;
-      return this.destroy_fn = null;
+      return this.functions = null;
     };
 
     Job.prototype.run = function() {
-      if (this.init_fn) {
-        this.init_fn();
-        this.init_fn = null;
+      if (this.functions.start) {
+        this.functions.start();
+        this.functions.start = null;
       }
-      this.was_completed = this.run_fn();
+      this.was_completed = this.functions.tick ? this.functions.tick() : true;
       if (this.was_completed) {
         this._cleanup();
       }
@@ -29538,14 +29612,10 @@ this.require.define({
     };
 
     Job.prototype._cleanup = function() {
-      if (this.destroy_fn) {
-        this.destroy_fn(this.was_completed);
-        return this.destroy_fn = null;
+      if (this.functions.finish) {
+        this.functions.finish(this.was_completed);
+        return this.functions.finish = null;
       }
-    };
-
-    Job.isAJob = function(job) {
-      return job && (typeof job === 'object') && ('constructor' in job) && ('name' in job.constructor) && (job.constructor.name === 'Job');
     };
 
     return Job;
@@ -29575,8 +29645,8 @@ this.require.define({
       }
     };
 
-    JobQueue.prototype.push = function(init_fn_or_job, run_fn, destroy_fn) {
-      return this._appendJob(init_fn_or_job, run_fn, destroy_fn);
+    JobQueue.prototype.push = function(functions) {
+      return this._appendJob.apply(this, arguments);
     };
 
     JobQueue.prototype._doDestroy = function() {
@@ -29618,8 +29688,8 @@ this.require.define({
       return _results;
     };
 
-    JobList.prototype.append = function(init_fn_or_job, run_fn, destroy_fn) {
-      return this._appendJob(init_fn_or_job, run_fn, destroy_fn);
+    JobList.prototype.append = function(functions) {
+      return this._appendJob.apply(this, arguments);
     };
 
     return JobList;
@@ -29632,7 +29702,7 @@ this.require.define({
       this.index = index;
       this.excluded_boundary = excluded_boundary;
       if ((this.index === void 0) || !this.excluded_boundary) {
-        throw new Error("Background.Range: parameters invalid");
+        throw "Background.Range: parameters invalid";
       }
       return this;
     }
@@ -29666,7 +29736,7 @@ this.require.define({
 
     Range.prototype._addBatchLength = function(batch_length) {
       if (!batch_length) {
-        throw new Error("Background.Range._addBatchLength: batch_length invalid");
+        throw "Background.Range._addBatchLength: batch_length invalid";
       }
       this.excluded_boundary += batch_length;
       return this;
@@ -29691,7 +29761,7 @@ this.require.define({
       this.ranges = ranges;
       this.batch_length = batch_length;
       if (!this.ranges || !this.batch_length) {
-        throw new Error("Background.Range_xN: parameters invalid");
+        throw "Background.Range_xN: parameters invalid";
       }
       this.batch_index = 0;
       return this;
@@ -29752,7 +29822,7 @@ this.require.define({
 
     Range_xN.prototype._addBatchLength = function(batch_length) {
       if (!batch_length) {
-        throw new Error("Background.Range_xN._addBatchLength: batch_length invalid");
+        throw "Background.Range_xN._addBatchLength: batch_length invalid";
       }
       this.batch_index = 0;
       this.batch_length = batch_length;
@@ -29771,7 +29841,7 @@ this.require.define({
       var excluded_boundary;
       this.array = array;
       if (!this.array) {
-        throw new Error("Background.ArrayIterator: missing array");
+        throw "Background.ArrayIterator: missing array";
       }
       this.reset();
       excluded_boundary = batch_length < this.array.length ? batch_length : (this.array.length ? this.array.length : 1);
@@ -29816,7 +29886,7 @@ this.require.define({
       var array, array_combination_count, ranges, _i, _j, _len, _len1, _ref, _ref1;
       this.arrays = arrays;
       if (!this.arrays) {
-        throw new Error("Background.ArrayIterator_xN: missing arrays");
+        throw "Background.ArrayIterator_xN: missing arrays";
       }
       array_combination_count = 1;
       _ref = this.arrays;
@@ -29865,10 +29935,10 @@ this.require.define({
 
 }).call(this);
 
-}
-});
-this.require.define({
-  'json-serialize': function(exports, require, module) {
+}});
+
+mb.require_define({'json-serialize': function(exports, require, module) {
+
 // Generated by CoffeeScript 1.3.3
 
 /*
@@ -30026,14 +30096,14 @@ this.require.define({
 
 }).call(this);
 
-}
-});
-this.require.define({
-  'knockback': function(exports, require, module) {
+}});
+
+mb.require_define({'knockback': function(exports, require, module) {
+
 // Generated by CoffeeScript 1.3.3
 
 /*
-  knockback.js 0.15.3
+  knockback.js 0.15.4
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -30048,7 +30118,19 @@ this.require.define({
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  _ = !this._ && (typeof require !== 'undefined') ? require('underscore')._ : this._;
+  if (typeof require !== 'undefined') {
+    try {
+      _ = require('lodash');
+    } catch (e) {
+      _ = require('underscore');
+    }
+  } else {
+    _ = this._;
+  }
+
+  if (_ && (_.hasOwnProperty('_'))) {
+    _ = _._;
+  }
 
   Backbone = !this.Backbone && (typeof require !== 'undefined') ? require('backbone') : this.Backbone;
 
@@ -30056,7 +30138,7 @@ this.require.define({
 
   Knockback = kb = this.Knockback = this.kb = typeof exports !== 'undefined' ? exports : {};
 
-  kb.VERSION = '0.15.3';
+  kb.VERSION = '0.15.4';
 
   kb.locale_manager = void 0;
 
@@ -30068,7 +30150,7 @@ this.require.define({
   kb.stats_on = false;
 
   /*
-    knockback_utils.js 0.15.3
+    knockback_utils.js 0.15.4
     (c) 2011, 2012 Kevin Malakoff.
     Knockback.js is freely distributable under the MIT license.
     See the following for full license details:
@@ -32151,14 +32233,14 @@ this.require.define({
 
 }).call(this);
 
-}
-});
-this.require.define({
-  'knockback-inspector': function(exports, require, module) {
+}});
+
+mb.require_define({'knockback-inspector': function(exports, require, module) {
+
 // Generated by CoffeeScript 1.3.3
 
 /*
-knockback-inspector.js 0.1.2
+knockback-inspector.js 0.1.3
 (c) 2012 Kevin Malakoff.
 Knockback-Inspector.js is freely distributable under the MIT license.
 See the following for full license details:
@@ -32172,9 +32254,17 @@ Dependencies: Knockout.js, Underscore.js, Backbone.js, and Knockback.js.
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  _ = !window._ && (typeof require !== 'undefined') ? require('underscore') : window._;
+  if (typeof require !== 'undefined') {
+    try {
+      _ = require('lodash');
+    } catch (e) {
+      _ = require('underscore');
+    }
+  } else {
+    _ = this._;
+  }
 
-  if (_ && !_.VERSION) {
+  if (_ && (_.hasOwnProperty('_'))) {
     _ = _._;
   }
 
@@ -32186,27 +32276,27 @@ Dependencies: Knockout.js, Underscore.js, Backbone.js, and Knockback.js.
 
   kbi = this.kbi = typeof exports !== 'undefined' ? exports : {};
 
-  this.kbi.VERSION = '0.1.2';
+  this.kbi.VERSION = '0.1.3';
 
   kbi.TemplateSource = (function() {
 
-    function TemplateSource(template_generator, template_data) {
+    function TemplateSource(template_generator, binding_context) {
       this.template_generator = template_generator;
-      this.template_data = template_data != null ? template_data : {};
+      this.binding_context = binding_context != null ? binding_context : {};
     }
 
     TemplateSource.prototype.data = function(key, value) {
       if (arguments.length === 1) {
-        return this.template_data[key];
+        return this.binding_context[key];
       }
-      return this.template_data[key] = value;
+      return this.binding_context[key] = value;
     };
 
     TemplateSource.prototype.text = function() {
       if (arguments.length > 0) {
         throw 'kbi.TemplateSource: unexpected writing to template source';
       }
-      return this.template_generator.viewText(this.template_data);
+      return this.template_generator.viewText(this.binding_context);
     };
 
     return TemplateSource;
@@ -32347,23 +32437,23 @@ Dependencies: Knockout.js, Underscore.js, Backbone.js, and Knockback.js.
       this.template_name = template_name;
     }
 
-    CollectionNodeViewGenerator.prototype.viewText = function(data) {
-      return "" + (this.nodeStart(data)) + "\n" + (this.nodeManipulator(data)) + "\n  <!-- ko if: opened -->\n    <!-- ko foreach: node -->\n      " + (this.modelNode(data)) + "\n    <!-- /ko -->\n  <!-- /ko -->\n" + (this.nodeEnd(data));
+    CollectionNodeViewGenerator.prototype.viewText = function(binding_context) {
+      return "" + (this.nodeStart(binding_context)) + "\n" + (this.nodeManipulator(binding_context)) + "\n  <!-- ko if: opened -->\n    <!-- ko foreach: node -->\n      " + (this.modelNode(binding_context)) + "\n    <!-- /ko -->\n  <!-- /ko -->\n" + (this.nodeEnd(binding_context));
     };
 
-    CollectionNodeViewGenerator.prototype.nodeStart = function(data) {
+    CollectionNodeViewGenerator.prototype.nodeStart = function(binding_context) {
       return "<li class='kbi' data-bind=\"css: {opened: opened, closed: !opened()}\">";
     };
 
-    CollectionNodeViewGenerator.prototype.nodeManipulator = function(data) {
+    CollectionNodeViewGenerator.prototype.nodeManipulator = function(binding_context) {
       return "<div class='collection' data-bind=\"click: function(){ opened(!opened()) }\">\n  <span data-bind=\"text: (opened() ? '- ' : '+ ' )\"></span>\n  <span data-bind=\"text: name\"></span>\n</div>";
     };
 
-    CollectionNodeViewGenerator.prototype.modelNode = function(data) {
+    CollectionNodeViewGenerator.prototype.modelNode = function(binding_context) {
       return "" + (kbi.ViewHTML.modelTree("'['+$index()+']'", false, "$data"));
     };
 
-    CollectionNodeViewGenerator.prototype.nodeEnd = function(data) {
+    CollectionNodeViewGenerator.prototype.nodeEnd = function(binding_context) {
       return "</li>";
     };
 
@@ -32377,31 +32467,31 @@ Dependencies: Knockout.js, Underscore.js, Backbone.js, and Knockback.js.
       this.template_name = template_name;
     }
 
-    ModelNodeViewGenerator.prototype.viewText = function(data) {
-      return "" + (this.nodeStart(data)) + "\n" + (this.nodeManipulator(data)) + "\n  <!-- ko if: opened -->\n    <!-- ko foreach: attribute_names -->\n      <!-- ko if: ($parent.attributeType($data) == 'simple') -->\n        " + (this.attributeEditor(data)) + "\n      <!-- /ko -->\n\n      <!-- ko if: ($parent.attributeType($data) == 'model') -->\n        " + (this.modelTree(data)) + "\n      <!-- /ko -->\n\n      <!-- ko if: ($parent.attributeType($data) == 'collection') -->\n        " + (this.modelTree(data)) + "\n      <!-- /ko -->\n\n    <!-- /ko -->\n  <!-- /ko -->\n" + (this.nodeEnd(data));
+    ModelNodeViewGenerator.prototype.viewText = function(binding_context) {
+      return "" + (this.nodeStart(binding_context)) + "\n" + (this.nodeManipulator(binding_context)) + "\n  <!-- ko if: opened -->\n    <!-- ko foreach: attribute_names -->\n      <!-- ko if: ($parent.attributeType($data) == 'simple') -->\n        " + (this.attributeEditor(binding_context)) + "\n      <!-- /ko -->\n\n      <!-- ko if: ($parent.attributeType($data) == 'model') -->\n        " + (this.modelTree(binding_context)) + "\n      <!-- /ko -->\n\n      <!-- ko if: ($parent.attributeType($data) == 'collection') -->\n        " + (this.modelTree(binding_context)) + "\n      <!-- /ko -->\n\n    <!-- /ko -->\n  <!-- /ko -->\n" + (this.nodeEnd(binding_context));
     };
 
-    ModelNodeViewGenerator.prototype.nodeStart = function(data) {
+    ModelNodeViewGenerator.prototype.nodeStart = function(binding_context) {
       return "<li class='kbi' data-bind=\"css: {opened: opened, closed: !opened()}\">";
     };
 
-    ModelNodeViewGenerator.prototype.nodeManipulator = function(data) {
+    ModelNodeViewGenerator.prototype.nodeManipulator = function(binding_context) {
       return "<div class='collection' data-bind=\"click: function(){ opened(!opened()) }\">\n  <span data-bind=\"text: (opened() ? '- ' : '+ ' )\"></span>\n  <span data-bind=\"text: name\"></span>\n</div>";
     };
 
-    ModelNodeViewGenerator.prototype.attributeEditor = function(data) {
-      return "<fieldset class='kbi'>\n  <label data-bind=\"text: $data\"> </label>\n  <input type='text' data-bind=\"value: $parent.node[$data]\">\n</fieldset>";
+    ModelNodeViewGenerator.prototype.attributeEditor = function(binding_context) {
+      return "<fieldset class='kbi'>\n  <label data-bind=\"text: $data\"></label>\n  <input type='text' data-bind=\"value: $parent.node[$data]\">\n</fieldset>";
     };
 
-    ModelNodeViewGenerator.prototype.modelTree = function(data) {
+    ModelNodeViewGenerator.prototype.modelTree = function(binding_context) {
       return "" + (kbi.ViewHTML.modelTree('$data', false, "$parent.node[$data]"));
     };
 
-    ModelNodeViewGenerator.prototype.collectionTree = function(data) {
+    ModelNodeViewGenerator.prototype.collectionTree = function(binding_context) {
       return "" + (kbi.ViewHTML.collectionTree("$data+'[]'", true, "$parent.node[$data]"));
     };
 
-    ModelNodeViewGenerator.prototype.nodeEnd = function(data) {
+    ModelNodeViewGenerator.prototype.nodeEnd = function(binding_context) {
       return "</li>";
     };
 
@@ -32427,10 +32517,10 @@ Dependencies: Knockout.js, Underscore.js, Backbone.js, and Knockback.js.
 
 }).call(this);
 
-}
-});
-this.require.define({
-  'lifecycle': function(exports, require, module) {
+}});
+
+mb.require_define({'lifecycle': function(exports, require, module) {
+
 // Generated by CoffeeScript 1.3.3
 
 /*
@@ -32466,7 +32556,7 @@ this.require.define({
     return dest;
   };
 
-  
+
 // Shared empty constructor function to aid in prototype-chain creation.
 var ctor = function(){};
 
@@ -32668,10 +32758,10 @@ var extend = function (protoProps, classProps) {
 
 }).call(this);
 
-}
-});
-this.require.define({
-  'mixin-js': function(exports, require, module) {
+}});
+
+mb.require_define({'mixin-js': function(exports, require, module) {
+
 // Generated by CoffeeScript 1.3.3
 
 /*
@@ -34649,10 +34739,10 @@ this.require.define({
 
 }).call(this);
 
-}
-});
-this.require.define({
-  'underscore-awesomer': function(exports, require, module) {
+}});
+
+mb.require_define({'underscore-awesomer': function(exports, require, module) {
+
 // Generated by CoffeeScript 1.3.3
 
 /*
@@ -35256,14 +35346,24 @@ this.require.define({
 
 }).call(this);
 
-}
-});
-if (!this['_']) {this['_'] = this.require('underscore');}
-if (!this['Backbone']) {this['Backbone'] = this.require('backbone');}
-if (!this['ko']) {this['ko'] = this.require('knockout');}
-if (!this['kbi']) {this['kbi'] = this.require('knockback-inspector');}
-this.require('backbone-articulation');
-})(this);(function($) {
+}});
+
+root['_'] = root.require('underscore');
+root['Backbone'] = root.require('backbone');
+root['ko'] = root.require('knockout');
+root['kbi'] = root.require('knockback-inspector');
+
+root.require('backbone-articulation');
+})(this);
+;
+
+//
+// Note: this code has been extracted and generalized from: https://github.com/rniemeyer/knockout-kendo under the following licensing:
+// knockout-kendo v0.2.2 | (c) 2012 Ryan Niemeyer | http://www.opensource.org/licenses/mit-license
+//
+// This is WIP and subject to change.
+
+(function($) {
 
   // KM: plugin-style binding factory
   ko.uibindings = ko.uibindings || {};
@@ -35442,17 +35542,19 @@ this.require('backbone-articulation');
       };
   };
 
-})(jQuery);/**	
+})(jQuery);;
+
+/**
  * Backbone-relational.js 0.5.1
  * (c) 2011 Paul Uithol
- * 
+ *
  * Backbone-relational may be freely distributed under the MIT license.
  * For details and documentation: https://github.com/PaulUithol/Backbone-relational.
  * Depends on Backbone: https://github.com/documentcloud/backbone.
  */
 ( function( undefined ) {
 	"use strict";
-	
+
 	/**
 	 * CommonJS shim
 	 **/
@@ -35467,18 +35569,18 @@ this.require('backbone-articulation');
 		Backbone = window.Backbone;
 		exports = window;
 	}
-	
+
 	Backbone.Relational = {
 		showWarnings: true
 	};
-	
+
 	/**
 	 * Semaphore mixin; can be used as both binary and counting.
 	 **/
 	Backbone.Semaphore = {
 		_permitsAvailable: null,
 		_permitsUsed: 0,
-		
+
 		acquire: function() {
 			if ( this._permitsAvailable && this._permitsUsed >= this._permitsAvailable ) {
 				throw new Error( 'Max permits acquired' );
@@ -35487,7 +35589,7 @@ this.require('backbone-articulation');
 				this._permitsUsed++;
 			}
 		},
-		
+
 		release: function() {
 			if ( this._permitsUsed === 0 ) {
 				throw new Error( 'All permits released' );
@@ -35496,11 +35598,11 @@ this.require('backbone-articulation');
 				this._permitsUsed--;
 			}
 		},
-		
+
 		isLocked: function() {
 			return this._permitsUsed > 0;
 		},
-		
+
 		setAvailablePermits: function( amount ) {
 			if ( this._permitsUsed > amount ) {
 				throw new Error( 'Available permits cannot be less than used permits' );
@@ -35508,7 +35610,7 @@ this.require('backbone-articulation');
 			this._permitsAvailable = amount;
 		}
 	};
-	
+
 	/**
 	 * A BlockingQueue that accumulates items while blocked (via 'block'),
 	 * and processes them when unblocked (via 'unblock').
@@ -35519,7 +35621,7 @@ this.require('backbone-articulation');
 	};
 	_.extend( Backbone.BlockingQueue.prototype, Backbone.Semaphore, {
 		_queue: null,
-		
+
 		add: function( func ) {
 			if ( this.isBlocked() ) {
 				this._queue.push( func );
@@ -35528,24 +35630,24 @@ this.require('backbone-articulation');
 				func();
 			}
 		},
-		
+
 		process: function() {
 			while ( this._queue && this._queue.length ) {
 				this._queue.shift()();
 			}
 		},
-		
+
 		block: function() {
 			this.acquire();
 		},
-		
+
 		unblock: function() {
 			this.release();
 			if ( !this.isBlocked() ) {
 				this.process();
 			}
 		},
-		
+
 		isBlocked: function() {
 			return this.isLocked();
 		}
@@ -35555,7 +35657,7 @@ this.require('backbone-articulation');
 	 * until the top-level object is fully initialized (see 'Backbone.RelationalModel').
 	 */
 	Backbone.Relational.eventQueue = new Backbone.BlockingQueue();
-	
+
 	/**
 	 * Backbone.Store keeps track of all created (and destruction of) Backbone.RelationalModel.
 	 * Handles lookup for relations.
@@ -35567,7 +35669,7 @@ this.require('backbone-articulation');
 	_.extend( Backbone.Store.prototype, Backbone.Events, {
 		_collections: null,
 		_reverseRelations: null,
-		
+
 		/**
 		 * Add a reverse relation. Is added to the 'relations' property on model's prototype, and to
 		 * existing instances of 'model' in the store as well.
@@ -35583,19 +35685,19 @@ this.require('backbone-articulation');
 					return val === rel[ key ];
 				});
 			});
-			
+
 			if ( !exists && relation.model && relation.type ) {
 				this._reverseRelations.push( relation );
-				
+
 				if ( !relation.model.prototype.relations ) {
 					relation.model.prototype.relations = [];
 				}
 				relation.model.prototype.relations.push( relation );
-				
+
 				this.retroFitRelation( relation );
 			}
 		},
-		
+
 		/**
 		 * Add a 'relation' to all existing instances of 'relation.model' in the store
 		 * @param {object} relation
@@ -35606,7 +35708,7 @@ this.require('backbone-articulation');
 				new relation.type( model, relation );
 			}, this);
 		},
-		
+
 		/**
 		 * Find the Store's collection for a certain type of model.
 		 * @param {Backbone.RelationalModel} model
@@ -35617,14 +35719,14 @@ this.require('backbone-articulation');
 					// Check if model is the type itself (a ref to the constructor), or is of type c.model
 					return model === c.model || model.constructor === c.model;
 				});
-			
+
 			if ( !coll ) {
 				coll = this._createCollection( model );
 			}
-			
+
 			return coll;
 		},
-		
+
 		/**
 		 * Find a type on the global object by name. Splits name on dots.
 		 * @param {String} name
@@ -35636,23 +35738,23 @@ this.require('backbone-articulation');
 			}, exports);
 			return type !== exports ? type: null;
 		},
-		
+
 		_createCollection: function( type ) {
 			var coll;
-			
+
 			// If 'type' is an instance, take it's constructor
 			if ( type instanceof Backbone.RelationalModel ) {
 				type = type.constructor;
 			}
-			
+
 			// Type should inherit from Backbone.RelationalModel.
 			if ( type.prototype instanceof Backbone.RelationalModel.prototype.constructor ) {
 				coll = new Backbone.Collection();
 				coll.model = type;
-				
+
 				this._collections.push( coll );
 			}
-			
+
 			return coll;
 		},
 
@@ -35686,7 +35788,7 @@ this.require('backbone-articulation');
 			var coll = this.getCollection( type );
 			return coll && coll.get( id );
 		},
-		
+
 		/**
 		 * Add a 'model' to it's appropriate collection. Retain the original contents of 'model.collection'.
 		 * @param {Backbone.RelationalModel} model
@@ -35698,7 +35800,7 @@ this.require('backbone-articulation');
 			model.bind( 'destroy', this.unregister, this );
 			model.collection = modelColl;
 		},
-		
+
 		/**
 		 * Explicitly update a model's id in it's store collection
 		 * @param {Backbone.RelationalModel} model
@@ -35707,7 +35809,7 @@ this.require('backbone-articulation');
 			var coll = this.getCollection( model );
 			coll._onModelEvent( 'change:' + model.idAttribute, model, coll );
 		},
-		
+
 		/**
 		 * Remove a 'model' from the store.
 		 * @param {Backbone.RelationalModel} model
@@ -35719,7 +35821,7 @@ this.require('backbone-articulation');
 		}
 	});
 	Backbone.Relational.store = new Backbone.Store();
-	
+
 	/**
 	 * The main Relation class, from which 'HasOne' and 'HasMany' inherit. Internally, 'relational:<key>' events
 	 * are used to regulate addition and removal of models from relations.
@@ -35743,7 +35845,7 @@ this.require('backbone-articulation');
 			Backbone[ this.reverseRelation.type ] || Backbone.Relational.store.getObjectByName( this.reverseRelation.type );
 		this.model = options.model || this.instance.constructor;
 		this.options = _.defaults( options, this.options, Backbone.Relation.prototype.options );
-		
+
 		this.key = this.options.key;
 		this.keySource = this.options.keySource || this.key;
 		this.keyDestination = this.options.keyDestination || this.options.keySource || this.key;
@@ -35806,14 +35908,14 @@ this.require('backbone-articulation');
 			includeInJSON: true,
 			isAutoRelation: false
 		},
-		
+
 		instance: null,
 		key: null,
 		keyContents: null,
 		relatedModel: null,
 		reverseRelation: null,
 		related: null,
-		
+
 		_relatedModelAdded: function( model, coll, options ) {
 			// Allow 'model' to set up it's relations, before calling 'tryAddRelated'
 			// (which can result in a call to 'addRelated' on a relation of 'model')
@@ -35822,17 +35924,17 @@ this.require('backbone-articulation');
 				dit.tryAddRelated( model, options );
 			});
 		},
-		
+
 		_relatedModelRemoved: function( model, coll, options ) {
 			this.removeRelated( model, options );
 		},
-		
+
 		_modelRemovedFromCollection: function( model ) {
 			if ( model === this.instance ) {
 				this.destroy();
 			}
 		},
-		
+
 		/**
 		 * Check several pre-conditions.
 		 * @return {Boolean} True if pre-conditions are satisfied, false if they're not.
@@ -35894,13 +35996,13 @@ this.require('backbone-articulation');
 			this.instance.set( this.key, related, _.defaults( options || {}, { silent: true } ) );
 			this.instance.release();
 		},
-		
+
 		createModel: function( item ) {
 			if ( this.options.createModels && typeof( item ) === 'object' ) {
 				return new this.relatedModel( item );
 			}
 		},
-		
+
 		/**
 		 * Determine if a relation (on a different RelationalModel) is the reverse
 		 * relation of the current one.
@@ -35914,7 +36016,7 @@ this.require('backbone-articulation');
 			}
 			return false;
 		},
-		
+
 		/**
 		 * Get the reverse relations (pointing back to 'this.key' on 'this.instance') for the currently related model(s).
 		 * @param {Backbone.RelationalModel} [model] Get the reverse relations for a specific model.
@@ -35932,10 +36034,10 @@ this.require('backbone-articulation');
 					}
 				}, this );
 			}, this );
-			
+
 			return reverseRelations;
 		},
-		
+
 		/**
 		 * Rename options.silent to options.silentChange, so events propagate properly.
 		 * (for example in HasMany, from 'addRelated'->'handleAddition')
@@ -35965,27 +36067,27 @@ this.require('backbone-articulation');
 			}
 			return options;
 		},
-		
+
 		// Cleanup. Get reverse relation, call removeRelated on each.
 		destroy: function() {
 			Backbone.Relational.store.getCollection( this.instance )
 				.unbind( 'relational:remove', this._modelRemovedFromCollection );
-			
+
 			Backbone.Relational.store.getCollection( this.relatedModel )
 				.unbind( 'relational:add', this._relatedModelAdded )
 				.unbind( 'relational:remove', this._relatedModelRemoved );
-			
+
 			_.each( this.getReverseRelations(), function( relation ) {
 					relation.removeRelated( this.instance );
 				}, this );
 		}
 	});
-	
+
 	Backbone.HasOne = Backbone.Relation.extend({
 		options: {
 			reverseRelation: { type: 'HasMany' }
 		},
-		
+
 		initialize: function() {
 			_.bindAll( this, 'onChange' );
 
@@ -36000,11 +36102,11 @@ this.require('backbone-articulation');
 				relation.addRelated( dit.instance );
 			} );
 		},
-		
+
 		findRelated: function( options ) {
 			var item = this.keyContents;
 			var model = null;
-			
+
 			if ( item instanceof this.relatedModel ) {
 				model = item;
 			}
@@ -36019,10 +36121,10 @@ this.require('backbone-articulation');
 					model = this.createModel( item );
 				}
 			}
-			
+
 			return model;
 		},
-		
+
 		/**
 		 * If the key is changed, notify old & new reverse relations and initialize the new relation
 		 */
@@ -36033,16 +36135,16 @@ this.require('backbone-articulation');
 			}
 			this.acquire();
 			options = this.sanitizeOptions( options );
-			
+
 			// 'options._related' is set by 'addRelated'/'removeRelated'. If it is set, the change
-			// is the result of a call from a relation. If it's not, the change is the result of 
+			// is the result of a call from a relation. If it's not, the change is the result of
 			// a 'set' call on this.instance.
 			var changed = _.isUndefined( options._related );
 			var oldRelated = changed ? this.related : options._related;
-			
-			if ( changed ) {	
+
+			if ( changed ) {
 				this.keyContents = attr;
-				
+
 				// Set new 'related'
 				if ( attr instanceof this.relatedModel ) {
 					this.related = attr;
@@ -36055,21 +36157,21 @@ this.require('backbone-articulation');
 					this.setRelated( null );
 				}
 			}
-			
+
 			// Notify old 'related' object of the terminated relation
 			if ( oldRelated && this.related !== oldRelated ) {
 				_.each( this.getReverseRelations( oldRelated ), function( relation ) {
 						relation.removeRelated( this.instance, options );
 					}, this );
 			}
-			
+
 			// Notify new 'related' object of the new relation. Note we do re-apply even if this.related is oldRelated;
 			// that can be necessary for bi-directional relations if 'this.instance' was created after 'this.related'.
 			// In that case, 'this.instance' will already know 'this.related', but the reverse might not exist yet.
 			_.each( this.getReverseRelations(), function( relation ) {
 					relation.addRelated( this.instance, options );
 				}, this);
-			
+
 			// Fire the 'update:<key>' event if 'related' was updated
 			if ( !options.silentChange && this.related !== oldRelated ) {
 				var dit = this;
@@ -36079,7 +36181,7 @@ this.require('backbone-articulation');
 			}
 			this.release();
 		},
-		
+
 		/**
 		 * If a new 'this.relatedModel' appears in the 'store', try to match it to the last set 'keyContents'
 		 */
@@ -36088,7 +36190,7 @@ this.require('backbone-articulation');
 				return;
 			}
 			options = this.sanitizeOptions( options );
-			
+
 			var item = this.keyContents;
 			if ( item ) {
 				var id = Backbone.Relational.store.resolveIdForItem( this.relatedModel, item );
@@ -36097,7 +36199,7 @@ this.require('backbone-articulation');
 				}
 			}
 		},
-		
+
 		addRelated: function( model, options ) {
 			if ( model !== this.related ) {
 				var oldRelated = this.related || null;
@@ -36105,12 +36207,12 @@ this.require('backbone-articulation');
 				this.onChange( this.instance, model, { _related: oldRelated } );
 			}
 		},
-		
+
 		removeRelated: function( model, options ) {
 			if ( !this.related ) {
 				return;
 			}
-			
+
 			if ( model === this.related ) {
 				var oldRelated = this.related || null;
 				this.setRelated( null );
@@ -36118,21 +36220,21 @@ this.require('backbone-articulation');
 			}
 		}
 	});
-	
+
 	Backbone.HasMany = Backbone.Relation.extend({
 		collectionType: null,
-		
+
 		options: {
 			reverseRelation: { type: 'HasOne' },
 			collectionType: Backbone.Collection,
 			collectionKey: true,
 			collectionOptions: {}
 		},
-		
+
 		initialize: function() {
 			_.bindAll( this, 'onChange', 'handleAddition', 'handleRemoval', 'handleReset' );
 			this.instance.bind( 'relational:change:' + this.key, this.onChange );
-			
+
 			// Handle a custom 'collectionType'
 			this.collectionType = this.options.collectionType;
 			if ( _( this.collectionType ).isString() ) {
@@ -36152,7 +36254,7 @@ this.require('backbone-articulation');
 
 			this.findRelated( { silent: true } );
 		},
-		
+
 		_getCollectionOptions: function() {
 			return _.isFunction( this.options.collectionOptions ) ?
 				this.options.collectionOptions( this.instance ) :
@@ -36177,10 +36279,10 @@ this.require('backbone-articulation');
 			}
 
 			collection.model = this.relatedModel;
-			
+
 			if ( this.options.collectionKey ) {
 				var key = this.options.collectionKey === true ? this.options.reverseRelation.key : this.options.collectionKey;
-				
+
 				if (collection[ key ] && collection[ key ] !== this.instance ) {
 					if ( Backbone.Relational.showWarnings && typeof console !== 'undefined' ) {
 						console.warn( 'Relation=%o; collectionKey=%s already exists on collection=%o', this, key, this.options.collectionKey );
@@ -36190,15 +36292,15 @@ this.require('backbone-articulation');
 					collection[ key ] = this.instance;
 				}
 			}
-			
+
 			collection
 				.bind( 'relational:add', this.handleAddition )
 				.bind( 'relational:remove', this.handleRemoval )
 				.bind( 'relational:reset', this.handleReset );
-			
+
 			return collection;
 		},
-		
+
 		findRelated: function( options ) {
 			if ( this.keyContents ) {
 				var models = [];
@@ -36234,19 +36336,19 @@ this.require('backbone-articulation');
 				}
 			}
 		},
-		
+
 		/**
 		 * If the key is changed, notify old & new reverse relations and initialize the new relation
 		 */
 		onChange: function( model, attr, options ) {
 			options = this.sanitizeOptions( options );
 			this.keyContents = attr;
-			
+
 			// Notify old 'related' object of the terminated relation
 			_.each( this.getReverseRelations(), function( relation ) {
 					relation.removeRelated( this.instance, options );
 				}, this );
-			
+
 			// Replace 'this.related' by 'attr' if it is a Backbone.Collection
 			if ( attr instanceof Backbone.Collection ) {
 				this._prepareCollection( attr );
@@ -36269,18 +36371,18 @@ this.require('backbone-articulation');
 				this.setRelated( coll );
 				this.findRelated( options );
 			}
-			
+
 			// Notify new 'related' object of the new relation
 			_.each( this.getReverseRelations(), function( relation ) {
 					relation.addRelated( this.instance, options );
 				}, this );
-			
+
 			var dit = this;
 			Backbone.Relational.eventQueue.add( function() {
 				!options.silentChange && dit.instance.trigger( 'update:' + dit.key, dit.instance, dit.related, options );
 			});
 		},
-		
+
 		tryAddRelated: function( model, options ) {
 			options = this.sanitizeOptions( options );
 			if ( !this.related.getByCid( model ) && !this.related.get( model ) ) {
@@ -36289,13 +36391,13 @@ this.require('backbone-articulation');
 					var id = Backbone.Relational.store.resolveIdForItem( this.relatedModel, item );
 					return id && id === model.id;
 				}, this );
-				
+
 				if ( item ) {
 					this.related.add( model, options );
 				}
 			}
 		},
-		
+
 		/**
 		 * When a model is added to a 'HasMany', trigger 'add' on 'this.instance' and notify reverse relations.
 		 * (should be 'HasOne', must set 'this.instance' as their related).
@@ -36307,9 +36409,9 @@ this.require('backbone-articulation');
 			if( !( model instanceof Backbone.Model ) ) {
 				return;
 			}
-			
+
 			options = this.sanitizeOptions( options );
-			
+
 			_.each( this.getReverseRelations( model ), function( relation ) {
 					relation.addRelated( this.instance, options );
 				}, this );
@@ -36320,7 +36422,7 @@ this.require('backbone-articulation');
 				!options.silentChange && dit.instance.trigger( 'add:' + dit.key, model, dit.related, options );
 			});
 		},
-		
+
 		/**
 		 * When a model is removed from a 'HasMany', trigger 'remove' on 'this.instance' and notify reverse relations.
 		 * (should be 'HasOne', which should be nullified)
@@ -36332,11 +36434,11 @@ this.require('backbone-articulation');
 			}
 
 			options = this.sanitizeOptions( options );
-			
+
 			_.each( this.getReverseRelations( model ), function( relation ) {
 					relation.removeRelated( this.instance, options );
 				}, this );
-			
+
 			var dit = this;
 			Backbone.Relational.eventQueue.add( function() {
 				!options.silentChange && dit.instance.trigger( 'remove:' + dit.key, model, dit.related, options );
@@ -36351,7 +36453,7 @@ this.require('backbone-articulation');
 				!options.silentChange && dit.instance.trigger( 'reset:' + dit.key, dit.related, options );
 			});
 		},
-		
+
 		addRelated: function( model, options ) {
 			var dit = this;
 			options = this.unsanitizeOptions( options );
@@ -36361,7 +36463,7 @@ this.require('backbone-articulation');
 				}
 			});
 		},
-		
+
 		removeRelated: function( model, options ) {
 			options = this.unsanitizeOptions( options );
 			if ( this.related.getByCid( model ) || this.related.get( model ) ) {
@@ -36369,7 +36471,7 @@ this.require('backbone-articulation');
 			}
 		}
 	});
-	
+
 	/**
 	 * A type of Backbone.Model that also maintains relations to other models and collections.
 	 * New events when compared to the original:
@@ -36383,7 +36485,7 @@ this.require('backbone-articulation');
 		_isInitialized: false,
 		_deferProcessing: false,
 		_queue: null,
-		
+
 		constructor: function( attributes, options ) {
 			// Nasty hack, for cases like 'model.get( <HasMany key> ).add( item )'.
 			// Defer 'processQueue', so that when 'Relation.createModels' is used we:
@@ -36395,7 +36497,7 @@ this.require('backbone-articulation');
 			var dit = this;
 			if ( options && options.collection ) {
 				this._deferProcessing = true;
-				
+
 				var processQueue = function( model ) {
 					if ( model === dit ) {
 						dit._deferProcessing = false;
@@ -36404,23 +36506,23 @@ this.require('backbone-articulation');
 					}
 				};
 				options.collection.bind( 'relational:add', processQueue );
-				
+
 				// So we do process the queue eventually, regardless of whether this model really gets added to 'options.collection'.
 				_.defer( function() {
 					processQueue( dit );
 				});
 			}
-			
+
 			this._queue = new Backbone.BlockingQueue();
 			this._queue.block();
 			Backbone.Relational.eventQueue.block();
-			
+
 			Backbone.Model.prototype.constructor.apply( this, arguments );
-			
+
 			// Try to run the global queue holding external events
 			Backbone.Relational.eventQueue.unblock();
 		},
-		
+
 		/**
 		 * Override 'trigger' to queue 'change' and 'change:*' events
 		 */
@@ -36434,10 +36536,10 @@ this.require('backbone-articulation');
 			else {
 				Backbone.Model.prototype.trigger.apply( this, arguments );
 			}
-			
+
 			return this;
 		},
-		
+
 		/**
 		 * Initialize Relations present in this.relations; determine the type (HasOne/HasMany), then creates a new instance.
 		 * Invoked in the first call so 'set' (which is made from the Backbone.Model constructor).
@@ -36445,7 +36547,7 @@ this.require('backbone-articulation');
 		initializeRelations: function() {
 			this.acquire(); // Setting up relations often also involve calls to 'set', and we only want to enter this function once
 			this._relations = [];
-			
+
 			_.each( this.relations, function( rel ) {
 					var type = !_.isString( rel.type ) ? rel.type :	Backbone[ rel.type ] || Backbone.Relational.store.getObjectByName( rel.type );
 					if ( type && type.prototype instanceof Backbone.Relation.prototype.constructor ) {
@@ -36455,12 +36557,12 @@ this.require('backbone-articulation');
 						Backbone.Relational.showWarnings && typeof console !== 'undefined' && console.warn( 'Relation=%o; missing or invalid type!', rel );
 					}
 				}, this );
-			
+
 			this._isInitialized = true;
 			this.release();
 			this.processQueue();
 		},
-		
+
 		/**
 		 * When new values are set, notify this model's relations (also if options.silent is set).
 		 * (Relation.setRelated locks this model before calling 'set' on it to prevent loops)
@@ -36475,14 +36577,14 @@ this.require('backbone-articulation');
 				}, this );
 			}
 		},
-		
+
 		/**
 		 * Either add to the queue (if we're not initialized yet), or execute right away.
 		 */
 		queue: function( func ) {
 			this._queue.add( func );
 		},
-		
+
 		/**
 		 * Process _queue
 		 */
@@ -36491,7 +36593,7 @@ this.require('backbone-articulation');
 				this._queue.unblock();
 			}
 		},
-		
+
 		/**
 		 * Get a specific relation.
 		 * @param key {string} The relation key to look for.
@@ -36504,7 +36606,7 @@ this.require('backbone-articulation');
 				}
 			}, this );
 		},
-		
+
 		/**
 		 * Get all of the created relations.
 		 * @return {Backbone.Relation[]}
@@ -36512,7 +36614,7 @@ this.require('backbone-articulation');
 		getRelations: function() {
 			return this._relations;
 		},
-		
+
 		/**
 		 * Retrieve related objects.
 		 * @param key {string} The relation key to fetch models for.
@@ -36529,7 +36631,7 @@ this.require('backbone-articulation');
 					var id = Backbone.Relational.store.resolveIdForItem( rel.relatedModel, item );
 					return id && !Backbone.Relational.store.find( rel.relatedModel, id );
 				}, this );
-			
+
 			if ( toFetch && toFetch.length ) {
 				// Create a model for each entry in 'keyContents' that is to be fetched
 				var models = _.map( toFetch, function( item ) {
@@ -36546,12 +36648,12 @@ this.require('backbone-articulation');
 
 					return model;
 				}, this );
-				
+
 				// Try if the 'collection' can provide a url to fetch a set of models in one request.
 				if ( rel.related instanceof Backbone.Collection && _.isFunction( rel.related.url ) ) {
 					setUrl = rel.related.url( models );
 				}
-				
+
 				// An assumption is that when 'Backbone.Collection.url' is a function, it can handle building of set urls.
 				// To make sure it can, test if the url we got by supplying a list of models to fetch is different from
 				// the one supplied for the default fetch action (without args to 'url').
@@ -36588,13 +36690,13 @@ this.require('backbone-articulation');
 					}, this );
 				}
 			}
-			
+
 			return requests;
 		},
-		
+
 		set: function( key, value, options ) {
 			Backbone.Relational.eventQueue.block();
-			
+
 			// Duplicate backbone's behavior to allow separate key/value parameters, instead of a single 'attributes' object
 			var attributes;
 			if (_.isObject( key ) || key == null) {
@@ -36605,9 +36707,9 @@ this.require('backbone-articulation');
 				attributes = {};
 				attributes[ key ] = value;
 			}
-			
+
 			var result = Backbone.Model.prototype.set.apply( this, arguments );
-			
+
 			// 'set' is called quite late in 'Backbone.Model.prototype.constructor', but before 'initialize'.
 			// Ideal place to set up relations :)
 			if ( !this._isInitialized && !this.isLocked() ) {
@@ -36618,41 +36720,41 @@ this.require('backbone-articulation');
 			else if ( attributes && this.idAttribute in attributes ) {
 				Backbone.Relational.store.update( this );
 			}
-			
+
 			if ( attributes ) {
 				this.updateRelations( options );
 			}
-			
+
 			// Try to run the global queue holding external events
 			Backbone.Relational.eventQueue.unblock();
-			
+
 			return result;
 		},
-		
+
 		unset: function( attribute, options ) {
 			Backbone.Relational.eventQueue.block();
-			
+
 			var result = Backbone.Model.prototype.unset.apply( this, arguments );
 			this.updateRelations( options );
-			
+
 			// Try to run the global queue holding external events
 			Backbone.Relational.eventQueue.unblock();
-			
+
 			return result;
 		},
-		
+
 		clear: function( options ) {
 			Backbone.Relational.eventQueue.block();
-			
+
 			var result = Backbone.Model.prototype.clear.apply( this, arguments );
 			this.updateRelations( options );
-			
+
 			// Try to run the global queue holding external events
 			Backbone.Relational.eventQueue.unblock();
-			
+
 			return result;
 		},
-		
+
 		/**
 		 * Override 'change', so the change will only execute after 'set' has finised (relations are updated),
 		 * and 'previousAttributes' will be available when the event is fired.
@@ -36676,7 +36778,7 @@ this.require('backbone-articulation');
 
 			return new this.constructor( attributes );
 		},
-		
+
 		/**
 		 * Convert relations to JSON, omits them when required
 		 */
@@ -36685,10 +36787,10 @@ this.require('backbone-articulation');
 			if ( this.isLocked() ) {
 				return this.id;
 			}
-			
+
 			this.acquire();
 			var json = Backbone.Model.prototype.toJSON.call( this );
-			
+
 			_.each( this._relations, function( rel ) {
 				var value = json[ rel.key ];
 
@@ -36719,13 +36821,13 @@ this.require('backbone-articulation');
 					delete json[ rel.key ];
 				}
 			}, this );
-			
+
 			this.release();
 			return json;
 		}
 	});
 	_.extend( Backbone.RelationalModel.prototype, Backbone.Semaphore );
-	
+
 	/**
 	 * Override Backbone.Collection.add, so objects fetched from the server multiple times will
 	 * update the existing Model. Also, trigger 'relational:add'.
@@ -36767,10 +36869,10 @@ this.require('backbone-articulation');
 				this.trigger('relational:add', model, this, options);
 			}, this );
 		}
-		
+
 		return this;
 	};
-	
+
 	/**
 	 * Override 'Backbone.Collection.remove' to trigger 'relational:remove'.
 	 */
@@ -36790,7 +36892,7 @@ this.require('backbone-articulation');
 				this.trigger('relational:remove', model, this, options);
 			}
 		}, this );
-		
+
 		return this;
 	};
 
@@ -36815,7 +36917,7 @@ this.require('backbone-articulation');
 
 		return this;
 	};
-	
+
 	/**
 	 * Override 'Backbone.Collection.trigger' so 'add', 'remove' and 'reset' events are queued until relations
 	 * are ready.
@@ -36831,7 +36933,7 @@ this.require('backbone-articulation');
 		else {
 			trigger.apply( this, arguments );
 		}
-		
+
 		return this;
 	};
 
@@ -36867,6 +36969,8 @@ this.require('backbone-articulation');
 	};
 
 })();
+;
+
 // lib/handlebars/base.js
 var Handlebars = {};
 
@@ -37090,6 +37194,8 @@ Handlebars.VM = {
 
 Handlebars.template = Handlebars.VM.template;
 ;
+;
+
 (function() {
   var bindingFactory = new ko.uibindings.plugin.BindingFactory();
 
@@ -37175,7 +37281,9 @@ Handlebars.template = Handlebars.VM.template;
         }
     });
 
-})(this);(function() {
+})(this);;
+
+(function() {
   var bindingFactory = new ko.uibindings.plugin.BindingFactory();
 
   //utility to set the dataSource will a clean copy of data. Could be overriden at run-time.
@@ -37200,7 +37308,9 @@ Handlebars.template = Handlebars.VM.template;
         }
     });
 
-})(this);// SWITCH/CASE binding for Knockout http://knockoutjs.com/
+})(this);;
+
+// SWITCH/CASE binding for Knockout http://knockoutjs.com/
 // (c) Michael Best
 // License: MIT (http://www.opensource.org/licenses/mit-license.php)
 
@@ -37392,3 +37502,5 @@ ko.bindingHandlers['casenot.visible'] = makeCaseHandler('visible', true);
 ko.bindingHandlers['switch']['makeCaseHandler'] = makeCaseHandler;
 
 })();
+;
+

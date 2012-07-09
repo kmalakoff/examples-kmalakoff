@@ -1,2 +1,5 @@
-easybake = require('easy-bake')
-(new easybake.Oven('easy-bake-config.coffee')).publishTasks()
+fs = require 'fs'
+mb = require 'module-bundler'
+
+task 'build', 'Build the client bundle', (options) ->
+  mb.writeBundlesSync('bundle-config.coffee', {cwd: fs.realpathSync('.')})
