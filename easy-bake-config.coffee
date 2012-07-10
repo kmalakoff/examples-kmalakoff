@@ -13,13 +13,12 @@ module.exports =
       'ex_mixin_js'
       'ex_json_serialize_js'
     ]
-    modes:
-      test:
-        command: 'phantomjs'
-        runner: 'phantomjs-qunit-runner.js'
-        files: '**/*.html'
+    _test:
+      command: 'phantomjs'
+      runner: 'phantomjs-qunit-runner.js'
+      files: '**/*.html'
 
-  postinstall:
+  _postinstall:
     commands: [
       'cp underscore vendor/underscore-latest.js'
       'cp underscore-awesomer vendor/underscore-awesomer-latest.js'
