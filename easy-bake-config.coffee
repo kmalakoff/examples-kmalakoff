@@ -6,13 +6,14 @@ module.exports =
     directories: 'examples_lib'
 
   tests:
-    output: 'build'
     directories: [
       'ex_backbone_articulation_js'
       'ex_background_js'
       'ex_mixin_js'
       'ex_json_serialize_js'
     ]
+    _build:
+      output: 'build'
     _test:
       command: 'phantomjs'
       runner: 'phantomjs-qunit-runner.js'
