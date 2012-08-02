@@ -8,12 +8,6 @@ exports.config =
         'javascripts/vendor.js': /^vendor/
       order:
         before: [
-          'vendor/scripts/console-helper.js'
-          'vendor/scripts/jquery-1.7.2.js'
-          'vendor/scripts/bootstrap.js'
-          'vendor/scripts/jquery-ui.js'
-          'vendor/scripts/kmalakoff-client-bundle.js'
-          'vendor/scripts/knockout-ui-bindings.js'
         ]
 
     stylesheets:
