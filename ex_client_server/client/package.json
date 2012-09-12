@@ -12,7 +12,7 @@
     "node": "~0.6.10"
   },
   "scripts": {
-    "start": "mbundle bundle-config.coffee -x; brunch watch --server"
+    "start": "mbundle bundle-config.coffee; brunch watch --server"
   },
   "devDependencies": {
     "coffee-script": ">=1.3.3",
