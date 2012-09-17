@@ -25,12 +25,29 @@
   </ul>
 
   <div class="tab-content">
-    <div class="tab-pane active" id="home">HOME</div>
+    <div class="tab-pane active" id="home">
+      <p>HOME</p>
+      <button class='previous-pane btn btn-small' onclick="kb.previousPane(this)" data-path='^/.pane-navigator'><i class='icon-step-backward'></i></button>
+      <button class='next-pane btn btn-small' onclick="kb.nextPane(this)" data-path='^/.pane-navigator'><i class='icon-step-forward'></i></button>
+
+      <div style='position: relative; width: 100px; height: 100px'>
+        <div data-bind="PaneNavigator: {}">
+          <div class='pane cell'>
+            <p>Pane1</p>
+          </div>
+          <div class='pane cell'>
+            <p>Pane2</p>
+          </div>
+          <div class='pane cell'>
+            <p>Pane3</p>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="tab-pane" id="profile">PROFILE</div>
     <div class="tab-pane" id="messages">MESSAGES</div>
     <div class="tab-pane" id="settings">SETTINGS</div>
   </div>
-
 
   <h2>Example use of Tooltips</h2>
   <p>Hover over the links below to see tooltips:</p>
@@ -38,4 +55,8 @@
     <p class="muted" style="margin-bottom: 0;">Tight pants next level keffiyeh <a href="#" rel="tooltip" title="first tooltip" data-bind="bootstrapToolTip: {}">you probably</a> haven't heard of them. Photo booth beard raw denim letterpress vegan messenger bag stumptown. Farm-to-table seitan, mcsweeney's fixie sustainable quinoa 8-bit american apparel <a href="#" rel="tooltip" data-bind="bootstrapToolTip: {title: 'Another tooltip'}">have a</a> terry richardson vinyl chambray. Beard stumptown, cardigans banh mi lomo thundercats. Tofu biodiesel williamsburg marfa, four loko mcsweeney's cleanse vegan chambray. A really ironic artisan <a href="#" rel="tooltip" title="Another one here too" data-bind="bootstrapToolTip: {}">whatever keytar</a>, scenester farm-to-table banksy Austin <a href="#" rel="tooltip" title="The last tip!" data-bind="bootstrapToolTip: {}">twitter handle</a> freegan cred raw denim single-origin coffee viral.</p>
   </div>
 
+    var pane_navigator_el = $('.pane-navigator')[0];
+    var pane_navigator = new kb.PaneNavigator(pane_navigator_el, {no_remove: true, transition: 'NavigationSlide'});
+    kb.utils.wrappedPaneNavigator(pane_navigator_el, pane_navigator); // cache the pane_navigator for use by kb. It should be released with kb.utils.wrappedPaneNavigator(pane_navigator_el, null)
+    pane_navigator.push(new kb.Pane(pane_navigator_el.children[0]));
 </div>

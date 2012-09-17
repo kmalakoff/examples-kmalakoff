@@ -1,9 +1,5 @@
 template = require './templates/inspector'
-kb = require('knockback')
-error_reporter = { error: -> alert(JSON.stringify(arguments)) }
-
-Backbone = require 'backbone'
-Backbone.Articulation = require 'backbone-articulation'
+error_reporter = { error: -> alert("Failed to load or save. Please make sure the Express server is running.\nResponse: #{JSON.stringify(arguments)}") }
 
 class MyModel extends Backbone.Articulation.Model
   @factory: (attributes={}) -> return new MyModel(_.defaults(attributes, {id: _.uniqueId('id'), name: _.uniqueId('name'), created_at: new Date()}))

@@ -15,7 +15,6 @@ li.kbi {
   border-radius: 5px;
 }
 ul.kbi.root > li.kbi {
-  display: block;
   margin-left: 0px;
   margin-right: 0px;
 }

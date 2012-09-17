@@ -75,282 +75,255 @@
 })();
 
 window.require.define({"application": function(exports, require, module) {
-  (function() {
-    var Application, InspectorDialog,
-      __hasProp = Object.prototype.hasOwnProperty,
-      __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+  var Application, InspectorDialog,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-    InspectorDialog = require('views/inspector_dialog');
+  InspectorDialog = require('views/inspector_dialog');
 
-    Application = {
-      configure: function() {
-        var MyModelNodeGenerator, model_node_generator, template_engine;
-        template_engine = new kbi.TemplateEngine();
-        model_node_generator = template_engine.generator('kbi_model_node');
-        MyModelNodeGenerator = (function(_super) {
+  Application = {
+    configure: function() {
+      var MyModelNodeGenerator, model_node_generator, template_engine;
+      template_engine = new kbi.TemplateEngine();
+      model_node_generator = template_engine.generator('kbi_model_node');
+      MyModelNodeGenerator = (function(_super) {
 
-          __extends(MyModelNodeGenerator, _super);
+        __extends(MyModelNodeGenerator, _super);
 
-          function MyModelNodeGenerator() {
-            MyModelNodeGenerator.__super__.constructor.apply(this, arguments);
-          }
+        function MyModelNodeGenerator() {
+          return MyModelNodeGenerator.__super__.constructor.apply(this, arguments);
+        }
 
-          MyModelNodeGenerator.prototype.attributeEditor = function(data) {
-            return "<!-- ko ifnot: (($data == 'id') || ($data == '_type')) -->\n  <fieldset class='kbi'>\n\n    <label data-bind=\"text: $data\"></label>\n\n    <!-- ko switch: $parent.node[$data] -->\n      <!-- ko case: _.isDate($value) -->\n        <input type='date' data-bind=\"jqueryuiDatepicker: {date: $parent.node[$data], onSelect: function() { $parent.node[$data]($(this).datepicker('getDate')); } }\">\n      <!-- /ko -->\n      <!-- ko case: $else -->\n        <input type='text' data-bind=\"value: $parent.node[$data]\">\n      <!-- /ko -->\n    <!-- /ko -->\n\n  </fieldset>\n<!-- /ko -->";
-          };
+        MyModelNodeGenerator.prototype.attributeEditor = function(data) {
+          return "<!-- ko ifnot: (($data == 'id') || ($data == '_type')) -->\n  <fieldset class='kbi'>\n\n    <label data-bind=\"text: $data\"></label>\n\n    <!-- ko switch: $parent.node[$data] -->\n      <!-- ko case: _.isDate($value) -->\n        <input type='date' data-bind=\"jqueryuiDatepicker: {date: $parent.node[$data], onSelect: function() { $parent.node[$data]($(this).datepicker('getDate')); } }\">\n      <!-- /ko -->\n      <!-- ko case: $else -->\n        <input type='text' data-bind=\"value: $parent.node[$data]\">\n      <!-- /ko -->\n    <!-- /ko -->\n\n  </fieldset>\n<!-- /ko -->";
+        };
 
-          return MyModelNodeGenerator;
+        return MyModelNodeGenerator;
 
-        })(model_node_generator);
-        template_engine.generator('kbi_model_node', MyModelNodeGenerator);
-        ko.setTemplateEngine(template_engine);
-        $('body').html("<div id='page'>\n</di>");
-        this.inspector = new InspectorDialog();
-        return $('body').append(this.inspector.render().el);
-      },
-      initialize: function() {
-        var HomeView, Router;
-        HomeView = require('views/home_view');
-        Router = require('lib/router');
-        Application.configure();
-        this.home_view = new HomeView();
-        this.router = new Router();
-        return typeof Object.freeze === "function" ? Object.freeze(this) : void 0;
-      }
-    };
+      })(model_node_generator);
+      template_engine.generator('kbi_model_node', MyModelNodeGenerator);
+      ko.setTemplateEngine(template_engine);
+      $('body').html("<div id='page'>\n</di>");
+      this.inspector = new InspectorDialog();
+      return $('body').append(this.inspector.render().el);
+    },
+    initialize: function() {
+      var HomeView, Router;
+      HomeView = require('views/home_view');
+      Router = require('lib/router');
+      Application.configure();
+      this.home_view = new HomeView();
+      this.router = new Router();
+      return typeof Object.freeze === "function" ? Object.freeze(this) : void 0;
+    }
+  };
 
-    module.exports = Application;
-
-  }).call(this);
+  module.exports = Application;
   
 }});
 
 window.require.define({"initialize": function(exports, require, module) {
-  (function() {
+  
+  window.app = require('application');
 
-    window.app = require('application');
-
-    $(function() {
-      app.initialize();
-      return Backbone.history.start();
-    });
-
-  }).call(this);
+  $(function() {
+    app.initialize();
+    return Backbone.history.start();
+  });
   
 }});
 
 window.require.define({"lib/router": function(exports, require, module) {
-  (function() {
-    var Router, application,
-      __hasProp = Object.prototype.hasOwnProperty,
-      __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+  var Router, application,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-    application = require('application');
+  application = require('application');
 
-    module.exports = Router = (function(_super) {
+  module.exports = Router = (function(_super) {
 
-      __extends(Router, _super);
+    __extends(Router, _super);
 
-      function Router() {
-        Router.__super__.constructor.apply(this, arguments);
-      }
+    function Router() {
+      return Router.__super__.constructor.apply(this, arguments);
+    }
 
-      Router.prototype.routes = {
-        '': 'home'
-      };
+    Router.prototype.routes = {
+      '': 'home'
+    };
 
-      Router.prototype.home = function() {
-        return $('body #page').empty().append(application.home_view.render().el);
-      };
+    Router.prototype.home = function() {
+      return $('body #page').empty().append(application.home_view.render().el);
+    };
 
-      return Router;
+    return Router;
 
-    })(Backbone.Router);
-
-  }).call(this);
+  })(Backbone.Router);
   
 }});
 
 window.require.define({"models/collection": function(exports, require, module) {
-  (function() {
-    var Collection,
-      __hasProp = Object.prototype.hasOwnProperty,
-      __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+  var Collection,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-    module.exports = Collection = (function(_super) {
+  module.exports = Collection = (function(_super) {
 
-      __extends(Collection, _super);
+    __extends(Collection, _super);
 
-      function Collection() {
-        Collection.__super__.constructor.apply(this, arguments);
-      }
+    function Collection() {
+      return Collection.__super__.constructor.apply(this, arguments);
+    }
 
-      return Collection;
+    return Collection;
 
-    })(Backbone.Collection);
-
-  }).call(this);
+  })(Backbone.Collection);
   
 }});
 
 window.require.define({"models/model": function(exports, require, module) {
-  (function() {
-    var Model,
-      __hasProp = Object.prototype.hasOwnProperty,
-      __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+  var Model,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-    module.exports = Model = (function(_super) {
+  module.exports = Model = (function(_super) {
 
-      __extends(Model, _super);
+    __extends(Model, _super);
 
-      function Model() {
-        Model.__super__.constructor.apply(this, arguments);
-      }
+    function Model() {
+      return Model.__super__.constructor.apply(this, arguments);
+    }
 
-      return Model;
+    return Model;
 
-    })(Backbone.Model);
-
-  }).call(this);
+  })(Backbone.Model);
   
 }});
 
 window.require.define({"views/home_view": function(exports, require, module) {
-  (function() {
-    var HomeView, kb, template;
+  var HomeView, template;
 
-    template = require('./templates/home');
+  template = require('./templates/home');
 
-    kb = require('knockback');
+  module.exports = HomeView = (function() {
 
-    module.exports = HomeView = (function() {
+    function HomeView() {}
 
-      function HomeView() {}
+    HomeView.prototype.render = function() {
+      this.el = $(template());
+      ko.applyBindings({}, this.el[0]);
+      return this;
+    };
 
-      HomeView.prototype.render = function() {
-        this.el = $(template());
-        ko.applyBindings({}, this.el[0]);
-        return this;
-      };
+    return HomeView;
 
-      return HomeView;
-
-    })();
-
-  }).call(this);
+  })();
   
 }});
 
 window.require.define({"views/inspector_dialog": function(exports, require, module) {
-  (function() {
-    var Backbone, InspectorDialog, InspectorViewModel, MyCollection, MyModel, error_reporter, kb, template,
-      __hasProp = Object.prototype.hasOwnProperty,
-      __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+  var InspectorDialog, InspectorViewModel, MyCollection, MyModel, error_reporter, template,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-    template = require('./templates/inspector');
+  template = require('./templates/inspector');
 
-    kb = require('knockback');
+  error_reporter = {
+    error: function() {
+      return alert("Failed to load or save. Please make sure the Express server is running.\nResponse: " + (JSON.stringify(arguments)));
+    }
+  };
 
-    error_reporter = {
-      error: function() {
-        return alert(JSON.stringify(arguments));
+  MyModel = (function(_super) {
+
+    __extends(MyModel, _super);
+
+    function MyModel() {
+      return MyModel.__super__.constructor.apply(this, arguments);
+    }
+
+    MyModel.factory = function(attributes) {
+      if (attributes == null) {
+        attributes = {};
       }
+      return new MyModel(_.defaults(attributes, {
+        id: _.uniqueId('id'),
+        name: _.uniqueId('name'),
+        created_at: new Date()
+      }));
     };
 
-    Backbone = require('backbone');
+    return MyModel;
 
-    Backbone.Articulation = require('backbone-articulation');
+  })(Backbone.Articulation.Model);
 
-    MyModel = (function(_super) {
+  MyCollection = (function(_super) {
 
-      __extends(MyModel, _super);
+    __extends(MyCollection, _super);
 
-      function MyModel() {
-        MyModel.__super__.constructor.apply(this, arguments);
-      }
+    function MyCollection() {
+      return MyCollection.__super__.constructor.apply(this, arguments);
+    }
 
-      MyModel.factory = function(attributes) {
-        if (attributes == null) attributes = {};
-        return new MyModel(_.defaults(attributes, {
-          id: _.uniqueId('id'),
-          name: _.uniqueId('name'),
-          created_at: new Date()
-        }));
+    MyCollection.prototype.model = MyModel;
+
+    return MyCollection;
+
+  })(Backbone.Articulation.Collection);
+
+  InspectorViewModel = (function() {
+
+    function InspectorViewModel(collection) {
+      var _this = this;
+      this.target = kb.collectionObservable(collection, {
+        view_model: kb.ViewModel
+      });
+      this.is_open = ko.observable(false);
+      this.save = function(vm, event) {
+        var model, _i, _len, _ref, _results;
+        event.target.focus();
+        _ref = _this.target.collection().models;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          model = _ref[_i];
+          _results.push(model.save(null, error_reporter));
+        }
+        return _results;
       };
-
-      return MyModel;
-
-    })(Backbone.Articulation.Model);
-
-    MyCollection = (function(_super) {
-
-      __extends(MyCollection, _super);
-
-      function MyCollection() {
-        MyCollection.__super__.constructor.apply(this, arguments);
-      }
-
-      MyCollection.prototype.model = MyModel;
-
-      return MyCollection;
-
-    })(Backbone.Articulation.Collection);
-
-    InspectorViewModel = (function() {
-
-      function InspectorViewModel(collection) {
-        var _this = this;
-        this.target = kb.collectionObservable(collection, {
-          view_model: kb.ViewModel
-        });
-        this.is_open = ko.observable(false);
-        this.save = function(vm, event) {
-          var model, _i, _len, _ref, _results;
-          event.target.focus();
-          _ref = _this.target.collection().models;
-          _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            model = _ref[_i];
-            _results.push(model.save(null, error_reporter));
-          }
-          return _results;
-        };
-        this.toggle = function() {
-          return _this.is_open(!_this.is_open());
-        };
-        this.open = function() {
-          return _this.is_open(true);
-        };
-        this.close = function() {
-          return _this.is_open(false);
-        };
-      }
-
-      return InspectorViewModel;
-
-    })();
-
-    module.exports = InspectorDialog = (function() {
-
-      function InspectorDialog() {}
-
-      InspectorDialog.prototype.render = function() {
-        var collection;
-        collection = new MyCollection();
-        collection.url = 'http://localhost:3000/models';
-        collection.fetch(error_reporter);
-        this.view_model = new InspectorViewModel(collection);
-        this.el = $(template());
-        ko.applyBindings(this.view_model, this.el[0]);
-        _.extend(this, _.pick(this.view_model, 'toggle', 'open', 'close'));
-        return this;
+      this.toggle = function() {
+        return _this.is_open(!_this.is_open());
       };
+      this.open = function() {
+        return _this.is_open(true);
+      };
+      this.close = function() {
+        return _this.is_open(false);
+      };
+    }
 
-      return InspectorDialog;
+    return InspectorViewModel;
 
-    })();
+  })();
 
-  }).call(this);
+  module.exports = InspectorDialog = (function() {
+
+    function InspectorDialog() {}
+
+    InspectorDialog.prototype.render = function() {
+      var collection;
+      collection = new MyCollection();
+      collection.url = 'http://localhost:3000/models';
+      collection.fetch(error_reporter);
+      this.view_model = new InspectorViewModel(collection);
+      this.el = $(template());
+      ko.applyBindings(this.view_model, this.el[0]);
+      _.extend(this, _.pick(this.view_model, 'toggle', 'open', 'close'));
+      return this;
+    };
+
+    return InspectorDialog;
+
+  })();
   
 }});
 
@@ -369,6 +342,6 @@ window.require.define({"views/templates/inspector": function(exports, require, m
     var foundHelper, self=this;
 
 
-    return "<div>\n\n  <div class=\"modal fade\" data-bind=\"bootstrapModal: {show: is_open}\">\n\n    <div class=\"modal-header\">\n      <button type=\"button\" class=\"close\" data-bind=\"click: toggle\">×</button>\n      <h3>Model and Collection Inspector</h3>\n    </div>\n\n    <div class=\"modal-body\">\n      <ul class='kbi root' data-bind=\"template: {name: 'kbi_collection_node', data: kbi.nvm('root', true, target)}\"></ul>\n    </div>\n\n    <div class=\"modal-footer\">\n      <a href=\"#\" class=\"btn btn-primary\" data-bind=\"click: save\">Save Changes</a>\n    </div>\n\n  </div>\n\n  <ul class=\"nav nav-tabs\" data-bind=\"bootstrapTab: {}\">\n    <li><a href=\"#home\" data-toggle=\"tab\">Home</a></li>\n    <li><a href=\"#profile\" data-toggle=\"tab\">Profile</a></li>\n    <li><a href=\"#messages\" data-toggle=\"tab\">Messages</a></li>\n    <li><a href=\"#settings\" data-toggle=\"tab\">Settings</a></li>\n  </ul>\n\n  <div class=\"tab-content\">\n    <div class=\"tab-pane active\" id=\"home\">HOME</div>\n    <div class=\"tab-pane\" id=\"profile\">PROFILE</div>\n    <div class=\"tab-pane\" id=\"messages\">MESSAGES</div>\n    <div class=\"tab-pane\" id=\"settings\">SETTINGS</div>\n  </div>\n\n\n  <h2>Example use of Tooltips</h2>\n  <p>Hover over the links below to see tooltips:</p>\n  <div class=\"tooltip-demo well\">\n    <p class=\"muted\" style=\"margin-bottom: 0;\">Tight pants next level keffiyeh <a href=\"#\" rel=\"tooltip\" title=\"first tooltip\" data-bind=\"bootstrapToolTip: {}\">you probably</a> haven't heard of them. Photo booth beard raw denim letterpress vegan messenger bag stumptown. Farm-to-table seitan, mcsweeney's fixie sustainable quinoa 8-bit american apparel <a href=\"#\" rel=\"tooltip\" data-bind=\"bootstrapToolTip: {title: 'Another tooltip'}\">have a</a> terry richardson vinyl chambray. Beard stumptown, cardigans banh mi lomo thundercats. Tofu biodiesel williamsburg marfa, four loko mcsweeney's cleanse vegan chambray. A really ironic artisan <a href=\"#\" rel=\"tooltip\" title=\"Another one here too\" data-bind=\"bootstrapToolTip: {}\">whatever keytar</a>, scenester farm-to-table banksy Austin <a href=\"#\" rel=\"tooltip\" title=\"The last tip!\" data-bind=\"bootstrapToolTip: {}\">twitter handle</a> freegan cred raw denim single-origin coffee viral.</p>\n  </div>\n\n</div>";});
+    return "<div>\n\n  <div class=\"modal fade\" data-bind=\"bootstrapModal: {show: is_open}\">\n\n    <div class=\"modal-header\">\n      <button type=\"button\" class=\"close\" data-bind=\"click: toggle\">×</button>\n      <h3>Model and Collection Inspector</h3>\n    </div>\n\n    <div class=\"modal-body\">\n      <ul class='kbi root' data-bind=\"template: {name: 'kbi_collection_node', data: kbi.nvm('root', true, target)}\"></ul>\n    </div>\n\n    <div class=\"modal-footer\">\n      <a href=\"#\" class=\"btn btn-primary\" data-bind=\"click: save\">Save Changes</a>\n    </div>\n\n  </div>\n\n  <ul class=\"nav nav-tabs\" data-bind=\"bootstrapTab: {}\">\n    <li><a href=\"#home\" data-toggle=\"tab\">Home</a></li>\n    <li><a href=\"#profile\" data-toggle=\"tab\">Profile</a></li>\n    <li><a href=\"#messages\" data-toggle=\"tab\">Messages</a></li>\n    <li><a href=\"#settings\" data-toggle=\"tab\">Settings</a></li>\n  </ul>\n\n  <div class=\"tab-content\">\n    <div class=\"tab-pane active\" id=\"home\">\n      <p>HOME</p>\n      <button class='previous-pane btn btn-small' onclick=\"kb.previousPane(this)\" data-path='^/.pane-navigator'><i class='icon-step-backward'></i></button>\n      <button class='next-pane btn btn-small' onclick=\"kb.nextPane(this)\" data-path='^/.pane-navigator'><i class='icon-step-forward'></i></button>\n\n      <div style='position: relative; width: 100px; height: 100px'>\n        <div data-bind=\"PaneNavigator: {}\">\n          <div class='pane cell'>\n            <p>Pane1</p>\n          </div>\n          <div class='pane cell'>\n            <p>Pane2</p>\n          </div>\n          <div class='pane cell'>\n            <p>Pane3</p>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"tab-pane\" id=\"profile\">PROFILE</div>\n    <div class=\"tab-pane\" id=\"messages\">MESSAGES</div>\n    <div class=\"tab-pane\" id=\"settings\">SETTINGS</div>\n  </div>\n\n  <h2>Example use of Tooltips</h2>\n  <p>Hover over the links below to see tooltips:</p>\n  <div class=\"tooltip-demo well\">\n    <p class=\"muted\" style=\"margin-bottom: 0;\">Tight pants next level keffiyeh <a href=\"#\" rel=\"tooltip\" title=\"first tooltip\" data-bind=\"bootstrapToolTip: {}\">you probably</a> haven't heard of them. Photo booth beard raw denim letterpress vegan messenger bag stumptown. Farm-to-table seitan, mcsweeney's fixie sustainable quinoa 8-bit american apparel <a href=\"#\" rel=\"tooltip\" data-bind=\"bootstrapToolTip: {title: 'Another tooltip'}\">have a</a> terry richardson vinyl chambray. Beard stumptown, cardigans banh mi lomo thundercats. Tofu biodiesel williamsburg marfa, four loko mcsweeney's cleanse vegan chambray. A really ironic artisan <a href=\"#\" rel=\"tooltip\" title=\"Another one here too\" data-bind=\"bootstrapToolTip: {}\">whatever keytar</a>, scenester farm-to-table banksy Austin <a href=\"#\" rel=\"tooltip\" title=\"The last tip!\" data-bind=\"bootstrapToolTip: {}\">twitter handle</a> freegan cred raw denim single-origin coffee viral.</p>\n  </div>\n\n    var pane_navigator_el = $('.pane-navigator')[0];\n    var pane_navigator = new kb.PaneNavigator(pane_navigator_el, {no_remove: true, transition: 'NavigationSlide'});\n    kb.utils.wrappedPaneNavigator(pane_navigator_el, pane_navigator); // cache the pane_navigator for use by kb. It should be released with kb.utils.wrappedPaneNavigator(pane_navigator_el, null)\n    pane_navigator.push(new kb.Pane(pane_navigator_el.children[0]));\n</div>";});
 }});
 
