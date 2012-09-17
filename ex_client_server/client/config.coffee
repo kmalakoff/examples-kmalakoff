@@ -15,8 +15,8 @@ exports.config =
           'vendor/scripts/jquery-1.8.0.js',
           'vendor/scripts/kmalakoff/knockback-full-stack-0.16.5.js',
           'vendor/scripts/knockout-ui-bindings.js',
-          'vendor/scripts/kmalakoff/json-serialize-1.1.1.js',
-          'vendor/scripts/kmalakoff/lifecycle-1.0.1.js'
+          'vendor/scripts/kmalakoff/json-serialize-1.1.2.js',
+          'vendor/scripts/kmalakoff/lifecycle-1.0.2.js'
         ]
 
     stylesheets:
