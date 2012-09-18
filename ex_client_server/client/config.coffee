@@ -13,7 +13,7 @@ exports.config =
         before: [
           'vendor/scripts/console-helper.js',
           'vendor/scripts/jquery-1.8.0.js',
-          'vendor/scripts/kmalakoff/knockback-full-stack-0.16.5.js',
+          'vendor/scripts/kmalakoff/knockback-full-stack-0.16.6.js',
           'vendor/scripts/knockout-ui-bindings.js',
           'vendor/scripts/kmalakoff/json-serialize-1.1.2.js',
           'vendor/scripts/kmalakoff/lifecycle-1.0.2.js'
