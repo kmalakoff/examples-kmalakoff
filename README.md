@@ -26,6 +26,8 @@ Kevin
 Building, Running and Testing the library
 -----------------------
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/kmalakoff/examples-kmalakoff.svg)](https://greenkeeper.io/)
+
 ###Installing:
 
 1. install node.js: http://nodejs.org
